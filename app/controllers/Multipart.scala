@@ -43,7 +43,7 @@ object Multipart {
               opt_schema.get._2 
               else 
                 SchemaOptions.default
-      ValidationForm(inputData, opt_data, has_schema, input_schema, opts_schema)
+      ValidationForm(inputData, opt_data, has_schema, input_schema, opts_schema, "")
     }
   }
 
@@ -53,7 +53,7 @@ object Multipart {
         ; optsSchema <- parseSchemaOptions(mf)
         )
     yield {
-      ValidationForm(DataInput(), DataOptions.default,true, inputSchema, optsSchema)
+      ValidationForm(DataInput(), DataOptions.default,true, inputSchema, optsSchema, "")
     }
   }
   

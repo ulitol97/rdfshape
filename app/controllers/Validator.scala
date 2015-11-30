@@ -299,6 +299,22 @@ trait Validator { this: Controller =>
       vf.schemaOptions,
       PrefixMap.empty)
   }
+  
+  def byEndpoint(
+    schema: String,
+    schemaFormat: String,
+    schemaVersion: String, 
+    endpoint: String): Action[AnyContent] = Action { requesr => 
+    BadRequest(views.html.errorPage("This option is currently under maintenance"))
+  }
+
+  def byDereference(
+    schema: String,
+    schemaFormat: String,
+    schemaVersion: String, 
+    focusNode: String): Action[AnyContent] = Action { request =>
+      BadRequest(views.html.errorPage("This option is currently under maintenance"))
+  }
 
 }
 

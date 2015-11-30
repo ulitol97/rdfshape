@@ -16,6 +16,7 @@ case class ValidationForm(
     , withSchema : Boolean
     , schemaInput: SchemaInput
     , schemaOptions: SchemaOptions
+    , endpoint: String
     ) {
  
  // This method is used to show if form is withIRI or not in index.scala.html
@@ -102,6 +103,7 @@ object ValidationForm {
         , withSchema = false
         , schemaInput = SchemaInput()
         , schemaOptions = SchemaOptions.default
+        , endpoint = ""
         )
         
   def fromResult(vr:ValidationResult): ValidationForm = {
@@ -111,6 +113,7 @@ object ValidationForm {
     , withSchema = vr.withSchema
     , schemaInput = SchemaInput(vr.schemaStr,vr.schemaFormat, vr.schemaVersion)
     , schemaOptions = vr.schemaOptions
+    , endpoint = ""
     )
   }
   
@@ -121,17 +124,19 @@ object ValidationForm {
     , withSchema = false
     , schemaInput = SchemaInput()
     , schemaOptions = SchemaOptions.default
+    , endpoint = ""
     )
   }
   
   def fromSchemaConversion(schemaInput: SchemaInput): ValidationForm = {
     ValidationForm(
-      dataInput = DataInput()
-    , dataOptions = DataOptions.default
-    , withSchema = true
-    , schemaInput = schemaInput
-    , schemaOptions = SchemaOptions.fromSchemaInput(schemaInput)
-    )
+     dataInput = DataInput()
+   , dataOptions = DataOptions.default
+   , withSchema = true
+   , schemaInput = schemaInput
+   , schemaOptions = SchemaOptions.fromSchemaInput(schemaInput)
+   , endpoint = ""
+   )
   }
 
 }
