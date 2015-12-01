@@ -36,21 +36,29 @@
 </h1>
 
 <nav>
-<a href="@routes.Checker.data(
+<ul>
+<li class="dropdown">
+Syntax checking
+<ul>
+<li><a href="@routes.Checker.data(
             vf.dataStr,
             vf.dataFormat)" 
-            title="Check RDF Data syntax (no Schema)">Data Syntax</a>
-<a href="@routes.Checker.schema(
+            >RDF Syntax</a>
+</li>            
+<li><a href="@routes.Checker.schema(
             vf.schemaStr,
             vf.schemaFormat,
             vf.schemaVersion)" 
-            title="Check Schema syntax (no data)">Schema Syntax</a>
-<a href="@routes.Validator.dataSchema(vf.dataStr,
+            >Schema Syntax</a></li>
+</ul>
+<li class="dropdown">Validation
+<ul>
+<li><a href="@routes.Validator.dataSchema(vf.dataStr,
             vf.dataFormat,
             vf.schemaStr,
             vf.schemaFormat,
             vf.schemaVersion)" 
-            title="Validate RDF Data using a Schema">Data + Schema</a>
+            >Data + Schema (separated)</a></li>
 <!-- <a href="@routes.Validator.dataSchemaNode(vf.dataStr,
             vf.dataFormat,
             vf.schemaStr,
@@ -58,29 +66,55 @@
             vf.schemaVersion, 
             vf.focusNode)" 
             title="Validate a node in an RDf Data using a Schema (Find shapes)">Data + Schema + Node </a> -->
-<a href="@routes.Validator.data(vf.dataStr,vf.dataFormat,vf.schemaVersion)" 
-            title="Validate RDf & Schema together. Checks scopeNode/scopeClass declarations">Data & Schema together</a>
-<a href="@routes.Validator.byEndpoint(vf.schemaStr,vf.schemaFormat,vf.schemaVersion,vf.endpoint)" 
-            title="Validate endpoint">Endpoint</a>
-<a href="@routes.Validator.byDereference(vf.schemaStr,vf.schemaFormat,vf.schemaVersion,vf.focusNode)" 
-            title="Validate by dereference">By dereference</a>
-<a href="@routes.DataConverter.convert_data_get(data = vf.dataStr,
+<li><a href="@routes.Validator.data(
+			vf.dataStr,
+			vf.dataFormat,
+			vf.schemaVersion)" 
+            >
+            Data & Schema (together)</a>
+</li>            
+
+<li><a href="@routes.Validator.byEndpoint(
+			vf.schemaStr,
+			vf.schemaFormat,
+			vf.schemaVersion,
+			vf.endpoint)" 
+            >By endpoint</a>
+</li>
+<li><a href="@routes.Validator.byDereference(
+			vf.schemaStr,
+			vf.schemaFormat,
+			vf.schemaVersion,
+			vf.focusNode)" 
+            >By dereference</a>
+</li>
+</ul>
+</li>
+<li class="dropdown">Conversions
+<ul>
+<li><a href="@routes.DataConverter.convert_data_get(
+            data = vf.dataStr,
             inputFormat = vf.dataFormat,
             outputFormat = "TURTLE" 
-            )" title="Conversions betewen different RDF Data formats">Data Conversions</a>
-<a href="@routes.SchemaConverter.convert_schema_get(
+            )">RDF Conversions</a>
+</li>
+<li><a href="@routes.SchemaConverter.convert_schema_get(
 			schema = vf.schemaStr,
             inputFormat = vf.schemaFormat,
             outputFormat = "SHEXC",
             schemaVersion = vf.schemaVersion 
             )" 
-            title="Conversions between different Schema formats">Schema Conversions</a>
-
-<a href="@routes.Application.help()" 
-            title="Help & examples">Help</a>
-
-<a href="@routes.Application.about()" 
-            title="About this project">About</a>
+            >Schema Conversions</a>
+</li>
+</ul>
+</li>
+<li><a href="@routes.Application.help()" 
+            >Help</a>
+</li>
+<li><a href="@routes.Application.about()" 
+            >About</a>
+</li>            
+</ul>         
 </nav>
 
 </header>

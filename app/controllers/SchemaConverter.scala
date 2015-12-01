@@ -67,6 +67,7 @@ trait SchemaConverter { this: Controller =>
      
       r match {
        case TrySuccess((schemaInput, outputFormat,result)) => {
+         Logger.info("Convert_schema_post: " + schemaInput)
          val vf = ValidationForm.fromSchemaConversion(schemaInput)
          Ok(views.html.convert_schema(vf,outputFormat,result))
        }
