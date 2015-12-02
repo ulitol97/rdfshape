@@ -16,18 +16,26 @@ case class SchemaInput(
     , schema_file: Option[File]
     , schema_textarea: String
     , inputFormat: String
-    , schemaVersion: SchemaVersion  
+    , schemaProcessor: SchemaProcessor
     ) {
   
   def convertSchema(outputFormat: String): Try[String] = {
-    schemaVersion match {
+    schemaProcessor match {
       case SHACL =>
         for { inputStr <- getSchemaStr
             ; outStr <- ShaclConverter(inputStr, inputFormat, outputFormat)
             } 
         yield outStr
+      case ShExcala =>
+        for { inputStr <- getSchemaStr
+            ; outStr <- ShaclConverter(inputStr, inputFormat, outputFormat)
+            } 
+        yield outStr
+      case SHACL_FPWD => {
+        throw new Error(s"convertSchema: Unsupported schemaProcessor: $schemaProcessor yet")
+      }
       case _ => {
-        throw new Error(s"convertSchema: Unsupported schemaVersion: " + schemaVersion)
+        throw new Error(s"convertSchema: Unsupported schemaProcessor: $schemaProcessor yet")
       }
     }
   }
@@ -65,7 +73,7 @@ object SchemaInput {
              , schema_file = None
              , schema_textarea = ""
              , inputFormat = SchemaUtils.defaultSchemaFormat
-             , schemaVersion = SchemaVersions.default
+             , schemaProcessor = SchemaProcessors.default
              )
     
   def apply(str: String, format: String, version: String): SchemaInput = 
@@ -75,7 +83,7 @@ object SchemaInput {
         	   , schema_file = None
         	   , schema_textarea = str
              , inputFormat = format
-             , schemaVersion = SchemaVersions.get(version)
+             , schemaProcessor = SchemaProcessors.get(version)
         	   )
         	   
 }

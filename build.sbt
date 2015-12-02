@@ -12,9 +12,10 @@ lazy val root = (project in file(".")).enablePlugins(PlayScala).
     buildInfoPackage := "rdfshapeBuildinfo"
   )
 
-// unmanagedSourceDirectories in Compile <+= twirlCompileTemplates.target
 
 scalaVersion := "2.11.7"
+
+lazy val shExcalaVersion = "0.6.8"
 
 libraryDependencies ++= Seq(
   jdbc,
@@ -26,7 +27,7 @@ libraryDependencies ++= Seq(
 , "postgresql" % "postgresql" % "9.1-901-1.jdbc4"
 
 // ShExcala
-, "es.weso" % "shexcala_2.11" % "0.6.7" excludeAll(ExclusionRule(organization = "org.slf4j")) 
+, "es.weso" % "shexcala_2.11" % shExcalaVersion excludeAll(ExclusionRule(organization = "org.slf4j")) 
 
 // , "org.scalatest" %% "scalatest" % "2.2.4" % "test"
 , "org.scalatestplus" %% "play" % "1.2.0" % "test"
@@ -39,6 +40,9 @@ libraryDependencies ++= Seq(
 , "org.webjars" % "codemirror" % "4.3"
 , "org.webjars" % "prettify" % "4-Mar-2013"
 )
+
+// unmanagedSourceDirectories in Compile <+= twirlCompileTemplates.target
+
 
 resolvers += "Bintray" at "http://dl.bintray.com/weso/weso-releases"
 
