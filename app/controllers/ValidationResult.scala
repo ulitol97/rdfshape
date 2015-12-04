@@ -6,12 +6,10 @@ import xml.Utility.escape
 import es.weso.rdfgraph.nodes.RDFNode
 import es.weso.rdfgraph.nodes.IRI
 import es.weso.rdf.RDFTriples
-import com.hp.hpl.jena.sparql.function.library.e
 import scala.util._
 import es.weso.rdf._
 import play.Logger
 import es.weso.utils.SchemaUtils
-import es.weso.shacl.SchemaVersions._
 import es.weso.shacl._
 import es.weso.rdf.validator.{ ValidationResult => ShaclResult, _ }
 import es.weso.typing._
@@ -24,9 +22,9 @@ case class ValidationResult(
     dataStr: String, 
     dataOptions: DataOptions, 
     withSchema: Boolean, 
-    schemaStr: String, 
-    schemaFormat: String, 
-    schemaVersion: String, 
+    schemaStr: String,
+    schemaLanguage: SchemaLanguage,
+    schemaProcessor: SchemaProcessor,
     schemaOptions: SchemaOptions, 
     prefixMap: PrefixMap) {
   
@@ -111,9 +109,9 @@ case class ValidationResult(
     else None
   }
 
-  def schemaFormat_param: Option[String] = {
-    Some(schemaFormat)
-  }
+/*  def schemaFormat_param: Option[String] = {
+    Some(schemaLanguage.format)
+  } */
   
   def maybeFocusNode: Option[String] = {
     schemaOptions.opt_iri.map(_.str)
@@ -132,8 +130,8 @@ object ValidationResult {
         dataOptions = DataOptions.default, 
         withSchema = false,
         schemaStr = "",
-        schemaFormat = SchemaUtils.defaultSchemaFormat,
-        schemaVersion = defaultSchemaVersion,
+        schemaLanguage = SchemaLanguages.default,
+        schemaProcessor = SchemaProcessors.default,
         schemaOptions = SchemaOptions.default,
         prefixMap = PrefixMap.empty)
 
@@ -144,7 +142,8 @@ object ValidationResult {
     dataOptions: DataOptions,
     schema: Schema,
     str_schema: String,
-    schema_format: String,
+    schemaLanguage: SchemaLanguage,
+    schemaProcessor: SchemaProcessor,
     schemaOptions: SchemaOptions,
     pm: PrefixMap): ValidationResult = {
     val matcher = ShaclMatcher(schema, data)
@@ -154,19 +153,35 @@ object ValidationResult {
         msg, 
         next, 
         List(iri), 
-        str_data, dataOptions, true, str_schema, schema_format, defaultSchemaVersion, schemaOptions, pm)
+        str_data, dataOptions, true, str_schema, schemaLanguage, schemaProcessor, schemaOptions, pm)
   }
 
   def validateAny(
-    data: RDFReader, str_data: String, dataOptions: DataOptions, schema: Schema, str_schema: String, schema_format: String, schemaOptions: SchemaOptions, pm: PrefixMap): ValidationResult = {
+    data: RDFReader, 
+    dataStr: String, 
+    dataOptions: DataOptions, 
+    schema: Schema, 
+    schemaStr: String, 
+    schemaLanguage: SchemaLanguage,
+    schemaProcessor: SchemaProcessor,
+    schemaOptions: SchemaOptions, 
+    pm: PrefixMap): ValidationResult = {
     val nodes = data.subjects.toList
     val validator = ShaclMatcher(schema, data)
     val result = validator.matchAllNodes_AllLabels
     val (ok, msg, next) = extractResult(result)
-    ValidationResult(Some(ok), msg, next, nodes, str_data, dataOptions, true, str_schema, schema_format, defaultSchemaVersion, schemaOptions, pm)
+    ValidationResult(
+        Some(ok), 
+        msg, 
+        next, 
+        nodes, 
+        dataStr, 
+        dataOptions, true, 
+        schemaStr, schemaLanguage, schemaProcessor, schemaOptions, pm)
   }
 
-  def extractResult(result: ShaclResult[RDFNode, Label, Throwable]): (Boolean, String, Seq[Map[RDFNode, (Seq[Label], Seq[Label])]]) = {
+  def extractResult(result: ShaclResult[RDFNode, Label, Throwable]): 
+        (Boolean, String, Seq[Map[RDFNode, (Seq[Label], Seq[Label])]]) = {
     println("Extracting result from " + result)
     result.extract match {
       case Failure(e)     => (false, s"Validation Error: $e", Seq())
@@ -177,13 +192,20 @@ object ValidationResult {
 
   // TODO: Refactor the following code...
   def validate(
-    rdf: RDFReader, str_data: String, dataOptions: DataOptions, withSchema: Boolean, str_schema: String, schema_format: String, schema_version: String, schemaOptions: SchemaOptions): ValidationResult = {
+    rdf: RDFReader, 
+    str_data: String, 
+    dataOptions: DataOptions, 
+    withSchema: Boolean, 
+    str_schema: String, 
+    schemaLanguage: SchemaLanguage,
+    schemaProcessor: SchemaProcessor,
+    schemaOptions: SchemaOptions): ValidationResult = {
     if (withSchema) {
       Try(Schema.fromString(str_schema).get) match {
         case Success((schema, pm)) => {
           schemaOptions.opt_iri match {
-            case Some(iri) => validateIRI(iri, rdf, str_data, dataOptions, schema, str_schema, schema_format, schemaOptions, pm)
-            case None      => validateAny(rdf, str_data, dataOptions, schema, str_schema, schema_format, schemaOptions, pm)
+            case Some(iri) => validateIRI(iri, rdf, str_data, dataOptions, schema, str_schema, schemaLanguage, schemaProcessor, schemaOptions, pm)
+            case None      => validateAny(rdf, str_data, dataOptions, schema, str_schema, schemaLanguage, schemaProcessor, schemaOptions, pm)
           }
         }
         case Failure(e) => {
@@ -191,14 +213,14 @@ object ValidationResult {
           ValidationResult(Some(false),
             "Schema did not parse: " + e.getMessage,
             Stream(), List(), str_data, dataOptions, true,
-            str_schema, schema_format, schema_version, schemaOptions,
+            str_schema, schemaLanguage, schemaProcessor, schemaOptions,
             PrefixMap.empty)
         }
       }
     } else
       ValidationResult(Some(true), "RDF parsed",
         Stream(), List(), str_data, dataOptions, false,
-        str_schema, schema_format, schema_version, schemaOptions,
+        str_schema, schemaLanguage, schemaProcessor, schemaOptions,
         PrefixMap.empty)
   }
 

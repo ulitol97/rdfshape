@@ -42,12 +42,12 @@ trait Checker { this: Controller =>
         DEFAULT_ShowSchema)
   }
   
-  def schema(schema: String, schemaFormat: String, schemaVersion: String) = 
+  def schema(schema: String, schemaFormat: String, schemaVocabulary: String, schemaProcessor: String) = 
     Action.async {  
-     schema_Future(schema,schemaFormat, schemaVersion).map(result => {
+     schema_Future(schema,schemaFormat, schemaVocabulary, schemaProcessor).map(result => {
                result match {
                 case TrySuccess(str) => {
-                  val schemaInput = SchemaInput(schema,schemaFormat,schemaVersion)
+                  val schemaInput = SchemaInput(schema,schemaFormat,schemaVocabulary,schemaProcessor)
                   val vf = ValidationForm.fromSchemaConversion(schemaInput)
                   Ok(views.html.check_schema(vf,str))
                 }
@@ -60,12 +60,11 @@ trait Checker { this: Controller =>
   def schema_Future(
           schema: String
         , schemaFormat: String
-        , schemaVersion: String
+        , schemaVocabulary: String
+        , schemaProcessor: String
         ) : Future[Try[String]]= {
-    val schemaInput = SchemaInput(schema,schemaFormat,schemaVersion)
-    println("schema_future: schemaInput: " + schemaInput)
+    val schemaInput = SchemaInput(schema,schemaFormat,schemaVocabulary,schemaProcessor)
     val output = schemaInput.convertSchema(schemaFormat)
-    println("schema_future: output: " + output)
     Future(output)
   }   
   

@@ -15,20 +15,20 @@ case class SchemaInput(
     , schema_uri : String
     , schema_file: Option[File]
     , schema_textarea: String
-    , inputFormat: String
+    , schemaLanguage: SchemaLanguage
     , schemaProcessor: SchemaProcessor
     ) {
   
   def convertSchema(outputFormat: String): Try[String] = {
     schemaProcessor match {
-      case SHACL =>
+      case SHACL => // TODO: SHACL = Shexcala by now...remove in the future
         for { inputStr <- getSchemaStr
-            ; outStr <- ShaclConverter(inputStr, inputFormat, outputFormat)
+            ; outStr <- ShaclConverter(inputStr, schemaLanguage.format, outputFormat)
             } 
         yield outStr
       case ShExcala =>
         for { inputStr <- getSchemaStr
-            ; outStr <- ShaclConverter(inputStr, inputFormat, outputFormat)
+            ; outStr <- ShaclConverter(inputStr, schemaLanguage.format, outputFormat)
             } 
         yield outStr
       case SHACL_FPWD => {
@@ -40,7 +40,9 @@ case class SchemaInput(
     }
   }
   
-  def ShaclConverter(str: String, inputFormat: String, outputFormat: String): Try[String] = {
+  def ShaclConverter(str: String, 
+      inputFormat: String, 
+      outputFormat: String): Try[String] = {
     if (str == "") Success("")
     else {
       for {
@@ -51,12 +53,16 @@ case class SchemaInput(
   
   def getSchemaStr: Try[String] = {
    input_type_Schema match {
-     case ByUri => if (schema_uri == "") 
+     case ByUri => 
+       if (schema_uri == "") 
     	 			Failure(throw new Exception("Empty URI"))
     	 		   else getURI(schema_uri)
-     case ByFile => getFileContents(schema_file)
-     case ByInput => Success(schema_textarea)
-     case _ => Failure(throw new Exception("get_SchemaString: Unsupported input type"))
+     case ByFile => 
+       getFileContents(schema_file)
+     case ByInput => 
+       Success(schema_textarea)
+     case _ => 
+       Failure(throw new Exception("get_SchemaString: Unsupported input type"))
    }
   }
   
@@ -72,18 +78,27 @@ object SchemaInput {
              , schema_uri = ""
              , schema_file = None
              , schema_textarea = ""
-             , inputFormat = SchemaUtils.defaultSchemaFormat
+             , schemaLanguage = SchemaLanguages.default
              , schemaProcessor = SchemaProcessors.default
              )
     
-  def apply(str: String, format: String, version: String): SchemaInput = 
+  def apply(str: String, format: String, vocab: String, processor: String): SchemaInput = 
     SchemaInput( 
                input_type_Schema = ByInput
         	   , schema_uri = ""
         	   , schema_file = None
         	   , schema_textarea = str
-             , inputFormat = format
-             , schemaProcessor = SchemaProcessors.get(version)
+             , schemaLanguage = SchemaLanguages.get(format,vocab)
+             , schemaProcessor = SchemaProcessors.get(processor)
+        	   )
+  def apply(str: String, language: SchemaLanguage, processor: SchemaProcessor): SchemaInput = 
+    SchemaInput( 
+               input_type_Schema = ByInput
+        	   , schema_uri = ""
+        	   , schema_file = None
+        	   , schema_textarea = str
+             , schemaLanguage = language
+             , schemaProcessor = processor
         	   )
         	   
 }

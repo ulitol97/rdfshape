@@ -77,14 +77,19 @@ case class ValidationForm(
    getSchemaStr.map(opt => opt.getOrElse("")).getOrElse("")
  }
  
- def schemaFormat: String = {
-   schemaInput.inputFormat
+ def schemaFormat: String = { 
+   // Todo. there are 2 ways to get format...select one of them...discard the other...
+   schemaInput.schemaLanguage.format
  }
  
- def schemaVersion : String = {
-   schemaInput.schemaVersion.versionName
+ def schemaProcessor : String = {
+   schemaInput.schemaProcessor.name
  }
 
+ def schemaVocabulary : String = {
+   schemaInput.schemaLanguage.vocabulary.name
+ }
+ 
  def focusNode : String = {
    schemaOptions.opt_iri.map(_.str).getOrElse("")
  }
@@ -111,7 +116,7 @@ object ValidationForm {
       dataInput = DataInput(vr.dataStr)
     , dataOptions = vr.dataOptions
     , withSchema = vr.withSchema
-    , schemaInput = SchemaInput(vr.schemaStr,vr.schemaFormat, vr.schemaVersion)
+    , schemaInput = SchemaInput(vr.schemaStr,vr.schemaLanguage,vr.schemaProcessor)
     , schemaOptions = vr.schemaOptions
     , endpoint = ""
     )

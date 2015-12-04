@@ -26,6 +26,31 @@ import play.api.Logger
 
 object Multipart {
 
+  lazy val withIRIKey = "withIRI"
+  lazy val iriKey = "iri"
+  lazy val iriStem = "#iri"
+  lazy val noIriStem = "#noIri"
+  lazy val dataKey = "data"
+  lazy val dataFormatKey = "data_format"
+  lazy val dataUriKey = "data_uri"
+  lazy val dataFileKey = "data_file"
+  lazy val showDataKey = "showData"
+  lazy val dataTextareaKey = "data_textarea"
+  lazy val schemaKey = "schema"
+  lazy val schemaFormatKey = "schema_format"
+  lazy val schemaLanguageKey = "schema_language"
+  lazy val schemaProcessorKey = "schema_processor"
+  lazy val schemaVocabularyKey = "schema_vocabulary"
+  lazy val schemaStem = "#schema"
+  lazy val noSchemaStem = "#no_schema" 
+  lazy val inputSchemaKey = "input-schema"
+  lazy val schemaUriKey = "schema_uri"
+  lazy val schemaFileKey = "schema_file"
+  lazy val schemaTextareaKey = "schema_textarea"
+  lazy val showSchemaKey = "showSchema"
+  lazy val MAX_CUT = 100
+  lazy val MIN_CUT = 1
+
    def getValidationForm(request: Request[AnyContent]): Try[ValidationForm] = {
     for ( mf <- getMultipartForm(request)
         ; inputData <- parseInputData(mf)
@@ -91,22 +116,22 @@ object Multipart {
   }
 
   def parseWithIRI(mf: MultipartFormData[TemporaryFile]): Try[Boolean] = {
-    for (value <- parseKey(mf,"withIRI")) yield {
-      if (value.startsWith("#noIri")) false
-      else if (value.startsWith("#iri")) true
+    for (value <- parseKey(mf,withIRIKey)) yield {
+      if (value.startsWith(noIriStem)) false
+      else if (value.startsWith(iriStem)) true
       else throw new Exception("parseWithIRI: unknown value " + value)
     }
   }
 
   def parseIRI(mf: MultipartFormData[TemporaryFile]): Try[IRI] = {
-    for (value <- parseKey(mf,"iri")) yield IRI(value)
+    for (value <- parseKey(mf,iriKey)) yield IRI(value)
   }
 
   def parseInputData(mf: MultipartFormData[TemporaryFile]): Try[DataInput] = {
-   for ( input_type_data <- parseInputType(mf,"data")
-       ; data_uri <- parseKeyOrElse(mf,"data_uri","")
-       ; data_textarea <- parseKeyOrElse(mf,"data_textarea","")
-       ; data_file <- parseFile(mf,"data_file")
+   for ( input_type_data <- parseInputType(mf,dataKey)
+       ; data_uri <- parseKeyOrElse(mf,dataUriKey,"")
+       ; data_textarea <- parseKeyOrElse(mf,dataTextareaKey,"")
+       ; data_file <- parseFile(mf,dataFileKey)
 //       ; data_endpoint <- parseKey(mf,"data_endpoint")
        ) yield {
      DataInput(input_type_data, data_uri, data_file, data_textarea)
@@ -114,24 +139,24 @@ object Multipart {
   }
   
   def parseOptData(mf: MultipartFormData[TemporaryFile]): Try[DataOptions] = {
-    for ( showData <- parseBoolean(mf,"showData")
-        ; data_format <- parseKey(mf,"data_format")
+    for ( showData <- parseBoolean(mf,showDataKey)
+        ; data_format <- parseKey(mf,dataFormatKey)
         ) yield 
         DataOptions(format = data_format, 
                     showData = showData)
    }
 
   def parseOptSchema(mf: MultipartFormData[TemporaryFile]): Try[Option[(SchemaInput,SchemaOptions)]] = {
-    for (value <- parseKey(mf,"schema")) yield {
+    for (value <- parseKey(mf,schemaKey)) yield {
       value match {
-        case "#schema" => {
+        case `schemaStem` => {
           val opts = 
             for ( input <- parseSchemaInput(mf)
                 ; options <- parseSchemaOptions(mf)
                 ) yield (input,options)
             opts.map(pair => Some(pair)).get
         }
-        case "#no_schema" => 
+        case `noSchemaStem` => 
           None
         case _ => 
           throw new Exception("Unknown value for key schema: " + value)
@@ -139,20 +164,36 @@ object Multipart {
     }
   }
   
-  def parseSchemaVersion(mf: MultipartFormData[TemporaryFile], key: String): Try[SchemaVersion] = {
+  def parseSchemaVocabulary(mf: MultipartFormData[TemporaryFile]): Try[SchemaVocabulary] = {
     for {
-      schema_version <- parseKey(mf,"schema_version")
-    ; schemaVersion <- SchemaVersions.lookup(schema_version)
-    } yield schemaVersion
+      schema_vocabulary <- parseKey(mf,schemaVocabularyKey)
+    ; schemaVocabulary <- SchemaVocabulary.lookup(schema_vocabulary)
+    } yield schemaVocabulary
   }
 
+  def parseSchemaProcessor(mf: MultipartFormData[TemporaryFile]): Try[SchemaProcessor] = {
+    for {
+      schema_processor <- parseKey(mf,schemaProcessorKey)
+    ; schemaProcessor <- SchemaProcessors.lookup(schema_processor)
+    } yield schemaProcessor
+  }
+  
+  def parseSchemaLanguage(mf: MultipartFormData[TemporaryFile]): Try[SchemaLanguage] = {
+    for {
+      schema_format <- parseKey(mf,schemaFormatKey)
+    ; schema_vocab <- parseSchemaVocabulary(mf)
+    } yield SchemaLanguage(schema_format,schema_vocab)
+  }
+
+  
   def parseSchemaInput(mf: MultipartFormData[TemporaryFile]): Try[SchemaInput] = {
-    for ( input_type_schema <- parseInputType(mf,"input-schema")
-        ; schema_uri <- parseKey(mf,"schema_uri")
-        ; schema_file <- parseFile(mf,"schema_file")
-        ; schema_textarea <- parseKey(mf,"schema_textarea")
-        ; schema_format <- parseKey(mf,"schema_format")
-        ; schema_version <- parseSchemaVersion(mf,"schema_version")
+    for ( input_type_schema <- parseInputType(mf,inputSchemaKey)
+        ; schema_uri <- parseKey(mf,schemaUriKey)
+        ; schema_file <- parseFile(mf,schemaFileKey)
+        ; schema_textarea <- parseKey(mf,schemaTextareaKey)
+        ; schema_format <- parseKey(mf,schemaFormatKey)
+        ; schema_language <- parseSchemaLanguage(mf)
+        ; schema_processor <- parseSchemaProcessor(mf)
         )
    yield
      SchemaInput(input_type_schema,
@@ -160,16 +201,19 @@ object Multipart {
          schema_file, 
          schema_textarea, 
          schema_format, 
-         schema_version)
+         schema_language,
+         schema_processor)
   }
 
   def parseSchemaOptions(mf: MultipartFormData[TemporaryFile]): Try[SchemaOptions] = {
-    for ( cut <- parseInt(mf,"cut",0,100)
+    for ( cut <- parseInt(mf,"cut",MIN_CUT,MAX_CUT)
         ; opt_iri <- parseOptIRI(mf)
-        ; showSchema <- parseBoolean(mf,"showSchema")
+        ; showSchema <- parseBoolean(mf,showSchemaKey)
+        ; schemaLanguage <- parseSchemaLanguage(mf)
+        ; schemaProcessor <- parseSchemaProcessor(mf)
         )
    yield
-     SchemaOptions(cut,opt_iri,showSchema)
+     SchemaOptions(cut,opt_iri,showSchema,schemaLanguage,schemaProcessor)
   }
 
   def parseBoolean(mf: MultipartFormData[TemporaryFile], key: String): Try[Boolean] = {

@@ -31,10 +31,11 @@ trait SchemaConverter { this: Controller =>
  def converterSchemaFuture(
           schema: String
         , inputFormat: String
-        , schemaVersion: String
+        , schemaVocabulary: String
+        , schemaProcessor: String
         , outputFormat: String
     ) : Future[Try[String]]= {
-       val schemaInput = SchemaInput(schema,inputFormat,schemaVersion)
+       val schemaInput = SchemaInput(schema,inputFormat,schemaVocabulary,schemaProcessor)
        Future(schemaInput.convertSchema(outputFormat))
   }
   
@@ -42,13 +43,14 @@ trait SchemaConverter { this: Controller =>
   def convert_schema_get(
           schema: String
         , inputFormat: String
-        , schemaVersion: String
+        , schemaVocabulary: String
+        , schemaProcessor: String
         , outputFormat: String
         ) = Action.async {  
-        converterSchemaFuture(schema,inputFormat, schemaVersion,outputFormat).map(output => {
+        converterSchemaFuture(schema,inputFormat, schemaVocabulary, schemaProcessor,outputFormat).map(output => {
               output match {
                 case TrySuccess(result) => {
-                  val schemaInput = SchemaInput(schema,inputFormat,schemaVersion)
+                  val schemaInput = SchemaInput(schema,inputFormat,schemaVocabulary,schemaProcessor)
                   val vf = ValidationForm.fromSchemaConversion(schemaInput)
                   Ok(views.html.convert_schema(vf,outputFormat,result))
                 }
