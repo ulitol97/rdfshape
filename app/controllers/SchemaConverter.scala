@@ -11,15 +11,16 @@ import play.api._
 import play.api.mvc._
 import play.api.libs.Files._
 import es.weso.shacl.Schema
-import scala.util.{Try, Success => TrySuccess, Failure => TryFailure}
+import scala.util._
 import es.weso.rdf._
 import es.weso.rdfgraph.nodes.IRI
 import es.weso.rdf.jena._
 import es.weso.monads.{Result => SchemaResult, Failure => SchemaFailure}
 import es.weso.shacl.{Schema => ShExSchema, SchemaFormats}
-import es.weso.utils._
-import es.weso.utils.TryUtils._
+import es.weso.utils.RDFUtils
 import es.weso.utils.RDFUtils._
+import es.weso.utils.TryUtils._
+import es.weso.shacl.SchemaLanguage 
 import java.net.URL
 import java.io.File
 import es.weso.utils.IOUtils._
@@ -27,16 +28,23 @@ import Multipart._
 import play.api.libs.json._
 
 trait SchemaConverter { this: Controller => 
+  
+ lazy val targetFormatKey = "targetFormat"
+ lazy val targetVocabularyKey = "targetVocabulary"
 
  def converterSchemaFuture(
           schema: String
         , inputFormat: String
         , schemaVocabulary: String
         , schemaProcessor: String
-        , outputFormat: String
-    ) : Future[Try[String]]= {
-       val schemaInput = SchemaInput(schema,inputFormat,schemaVocabulary,schemaProcessor)
-       Future(schemaInput.convertSchema(outputFormat))
+        , targetFormat: String
+        , targetVocabulary: String
+    ) : Future[Try[(String,SchemaInput)]]= {
+       Future(for {
+         schemaInput <- SchemaInput.build(schema,inputFormat,schemaVocabulary,schemaProcessor)
+         targetLanguage <- SchemaLanguage.lookup(targetFormat,targetVocabulary)
+         converted <- schemaInput.convertSchema(targetLanguage) 
+       } yield (converted,schemaInput))
   }
   
   
@@ -45,16 +53,16 @@ trait SchemaConverter { this: Controller =>
         , inputFormat: String
         , schemaVocabulary: String
         , schemaProcessor: String
-        , outputFormat: String
+        , targetFormat: String
+        , targetVocabulary: String
         ) = Action.async {  
-        converterSchemaFuture(schema,inputFormat, schemaVocabulary, schemaProcessor,outputFormat).map(output => {
+        converterSchemaFuture(schema,inputFormat, schemaVocabulary, schemaProcessor,targetFormat, targetVocabulary).map(output => {
               output match {
-                case TrySuccess(result) => {
-                  val schemaInput = SchemaInput(schema,inputFormat,schemaVocabulary,schemaProcessor)
+                case Success((result,schemaInput)) => {
                   val vf = ValidationForm.fromSchemaConversion(schemaInput)
-                  Ok(views.html.convert_schema(vf,outputFormat,result))
+                  Ok(views.html.convert_schema(vf,targetFormat,targetVocabulary, result))
                 }
-                case TryFailure(e) => BadRequest(views.html.errorPage(e.getMessage))
+                case Failure(e) => BadRequest(views.html.errorPage(e.getMessage))
               }
           })
   }
@@ -63,17 +71,19 @@ trait SchemaConverter { this: Controller =>
      val r = for ( mf <- getMultipartForm(request)
                  ; schemaInput <- parseSchemaInput(mf)
                  ; str_schema <- schemaInput.getSchemaStr
-                 ; outputFormat <- parseKey(mf, "outputFormat")
-                 ; outputStr <- schemaInput.convertSchema(outputFormat)
-                 ) yield (schemaInput, outputFormat,outputStr)
+                 ; targetFormat <- parseKey(mf, targetFormatKey)
+                 ; targetVocabulary <- parseKey(mf, targetVocabularyKey)
+                 ; targetLanguage <- SchemaLanguage.lookup(targetFormat,targetVocabulary)
+                 ; outputStr <- schemaInput.convertSchema(targetLanguage)
+                 ) yield (schemaInput, targetLanguage, outputStr)
      
       r match {
-       case TrySuccess((schemaInput, outputFormat,result)) => {
+       case Success((schemaInput, targetLanguage,result)) => {
          Logger.info("Convert_schema_post: " + schemaInput)
          val vf = ValidationForm.fromSchemaConversion(schemaInput)
-         Ok(views.html.convert_schema(vf,outputFormat,result))
+         Ok(views.html.convert_schema(vf,targetLanguage.format, targetLanguage.vocabulary.name,result))
        }
-       case TryFailure(e) => {
+       case Failure(e) => {
         Logger.info("Exception raised: " + e.getMessage)
         BadRequest(views.html.errorPage(e.getMessage)) 
        } 

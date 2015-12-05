@@ -30,7 +30,7 @@ class DataConverterTest
       val result = converter.convert_data_get(
           data = rdfStr,
           dataFormat="TURTLE", 
-          outputFormat="N-TRIPLES").apply(FakeRequest())
+          targetFormat="N-TRIPLES").apply(FakeRequest())
       status(result) mustEqual OK    
       }
   }

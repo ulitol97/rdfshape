@@ -130,8 +130,8 @@ object ValidationResult {
         dataOptions = DataOptions.default, 
         withSchema = false,
         schemaStr = "",
-        schemaLanguage = SchemaLanguages.default,
-        schemaProcessor = SchemaProcessors.default,
+        schemaLanguage = SchemaLanguage.default,
+        schemaProcessor = SchemaProcessor.default,
         schemaOptions = SchemaOptions.default,
         prefixMap = PrefixMap.empty)
 

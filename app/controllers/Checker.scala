@@ -15,13 +15,12 @@ import es.weso.rdf._
 import es.weso.rdfgraph.nodes.IRI
 import es.weso.rdf.jena._
 import es.weso.monads.{Result => SchemaResult, Failure => SchemaFailure, Passed}
-import es.weso.utils._
 import es.weso.utils.TryUtils._
 import es.weso.utils.RDFUtils._
 import es.weso.utils.IOUtils._
 import java.net.URL
 import java.io.File
-import scala.util.{Success => TrySuccess}
+import scala.util._
 import DataOptions._
 import SchemaOptions._
 
@@ -34,26 +33,22 @@ trait Checker { this: Controller =>
     Validator.validate_get(data,
         Some(dataFormat),
         DEFAULT_SHOW_DATA,
-        None,
-        None,
-        "",
-        None,
+        None, None, None, None, None,
         DEFAULT_CUT,
         DEFAULT_ShowSchema)
   }
   
   def schema(schema: String, schemaFormat: String, schemaVocabulary: String, schemaProcessor: String) = 
     Action.async {  
-     schema_Future(schema,schemaFormat, schemaVocabulary, schemaProcessor).map(result => {
+     schema_Future(schema,schemaFormat, schemaVocabulary, schemaProcessor).map(result => 
                result match {
-                case TrySuccess(str) => {
-                  val schemaInput = SchemaInput(schema,schemaFormat,schemaVocabulary,schemaProcessor)
+                case Success((str,schemaInput)) => {
                   val vf = ValidationForm.fromSchemaConversion(schemaInput)
                   Ok(views.html.check_schema(vf,str))
                 }
                 case Failure(e) => BadRequest(views.html.errorPage(e.getMessage))
-              }
-          })
+               }
+          )
     }
 
   
@@ -62,10 +57,14 @@ trait Checker { this: Controller =>
         , schemaFormat: String
         , schemaVocabulary: String
         , schemaProcessor: String
-        ) : Future[Try[String]]= {
-    val schemaInput = SchemaInput(schema,schemaFormat,schemaVocabulary,schemaProcessor)
-    val output = schemaInput.convertSchema(schemaFormat)
-    Future(output)
+        ) : Future[Try[(String,SchemaInput)]]= {
+    val result = {
+      for {
+        schemaInput <- SchemaInput.build(schema,schemaFormat,schemaVocabulary,schemaProcessor)
+        str <- schemaInput.convertSchema(schemaInput.schemaLanguage) 
+      } yield (str,schemaInput)
+    }
+    Future(result)
   }   
   
   
@@ -73,11 +72,11 @@ trait Checker { this: Controller =>
      val r = for ( mf <- getMultipartForm(request)
                  ; schemaInput <- parseSchemaInput(mf)
                  ; str_schema <- schemaInput.getSchemaStr
-                 ; outputStr <- schemaInput.convertSchema(schemaInput.inputFormat)
+                 ; outputStr <- schemaInput.convertSchema(schemaInput.schemaLanguage)
                  ) yield (schemaInput, outputStr)
      
       r match {
-       case TrySuccess((schemaInput, result)) => {
+       case Success((schemaInput, result)) => {
          val vf = ValidationForm.fromSchemaConversion(schemaInput)
          Ok(views.html.check_schema(vf,result))
        }

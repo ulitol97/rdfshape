@@ -52,7 +52,8 @@ class SchemaSyntaxTest
       val result = checker.schema(
           schema = schemaStr,
           schemaFormat="TURTLE", 
-          schemaVersion="SHACL_0.1").apply(FakeRequest())
+          schemaVocabulary="SHEX",
+          schemaProcessor="ShExcala_0.1").apply(FakeRequest())
       
       val bodyText : String = contentAsString(result)
       bodyText must include(escape(schemaStr))

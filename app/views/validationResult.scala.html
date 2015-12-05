@@ -42,9 +42,10 @@
 	         vr.dataStr,
 	         Some(vr.dataFormat),
 	         vr.showData,
-	         vr.schema_param,
-             vr.schemaFormat_param,
-             vr.schemaVersion,
+	         Some(vr.schemaStr),
+             Some(vr.schemaLanguage.format),
+             Some(vr.schemaLanguage.vocabulary.name),
+             Some(vr.schemaProcessor.name),
 	         vr.maybeFocusNode,
 	         vr.cut,
 	         vr.showSchema

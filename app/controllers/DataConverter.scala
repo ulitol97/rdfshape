@@ -33,20 +33,20 @@ trait DataConverter { this: Controller =>
         , dataFormat: String
         , outputFormat: String
     ) : Future[Try[String]]= {
-       Future(RDFParse(data,dataFormat).map(_.serialize(outputFormat)))
+       Future(parseRDF(data,dataFormat).map(_.serialize(outputFormat)))
   }
   
   
   def convert_data_get(
           data: String
         , dataFormat: String
-        , outputFormat: String
+        , targetFormat: String
         ) = Action.async {  
-        converterDataFuture(data,dataFormat, outputFormat).map(output => {
+        converterDataFuture(data,dataFormat, targetFormat).map(output => {
               output match {
                 case TrySuccess(result) => {
                   val vf = ValidationForm.fromDataConversion(data,dataFormat)
-                  Ok(views.html.convert_data(vf,outputFormat,result))
+                  Ok(views.html.convert_data(vf,targetFormat,result))
                 }
                 case TryFailure(e) => BadRequest(views.html.errorPage(e.getMessage))
               }

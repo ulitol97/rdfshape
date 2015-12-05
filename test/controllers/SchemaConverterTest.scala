@@ -29,9 +29,12 @@ class ConverterSchemaTest
                    |""".stripMargin
       val result = SchemaConverter.convert_schema_get(
           schema = schemaStr,
-          inputFormat="SHEXC", 
-          outputFormat="TURTLE",
-          schemaVersion="SHACL_0.1").apply(FakeRequest())
+          inputFormat="SHEXC",
+          schemaProcessor="ShExcala_0.1",
+          schemaVocabulary="SHEX",
+          targetFormat="TURTLE",
+          targetVocabulary="SHEX"          
+          ).apply(FakeRequest())
       
       val bodyText : String = contentAsString(result)
       bodyText must include(":a      a            sh:Shape ;")

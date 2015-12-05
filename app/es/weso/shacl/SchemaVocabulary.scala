@@ -2,21 +2,14 @@ package es.weso.shacl
 
 import scala.util._
 
-sealed trait SchemaVocabulary {
- 
- def name: String
- 
+case class SchemaVocabulary(name: String) {
  override def toString = s"$name"
 }
+
 object SchemaVocabulary {
 
-case object SHACL extends SchemaVocabulary {
- override def name = "SHACL"
-}
-
-case object ShEx extends SchemaVocabulary {
- override def versionName = "ShEx"
-}
+object SHACL extends SchemaVocabulary("SHACL")
+object ShEx extends SchemaVocabulary("ShEx")
   
 val availableVocabularies : List[SchemaVocabulary] = 
     List(SHACL, ShEx)

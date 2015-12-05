@@ -1,6 +1,7 @@
-@(vf:ValidationForm, outputFormat: String, result: String)
+@(vf:ValidationForm, targetFormat: String, targetVocabulary: String, result: String)
 
 @import play.api.i18n.Messages
+@import es.weso.shacl._
 
 @main(Messages("Convert.Schema"))(vf) {
 
@@ -12,22 +13,32 @@
 <a href="@routes.SchemaConverter.convert_schema_get(
 	         vf.schemaStr,
 	         vf.schemaFormat,
-             vf.schemaVersion,
-             outputFormat
+             vf.schemaVocabulary,
+             vf.schemaProcessor,
+             targetFormat,
+             targetVocabulary
 	         )">Generate permalink</a>
 
 <form method="post" 
 	  enctype="multipart/form-data" 
 	  action="@routes.SchemaConverter.convert_schema_post">
 
-<label for="output_format">@Messages("Output.schema.format")</label>
-    <select name="outputFormat">
-      @for(s <- SchemaOptions.availableFormats) {
+<label for="targetFormat">@Messages("Output.schema.format")</label>
+    <select name="targetFormat">
+      @for(s <- SchemaLanguage.availableFormats) {
       	<option value="@s"
-      	 @{if(outputFormat==s) { "checked" }}>@s</option>
+      	 @{if(targetFormat==s) { "checked" }}>@s</option>
       }
     </select>
 
+<label for="targetVocabulary">@Messages("Output.schema.vocabulary")</label>
+    <select name="targetVocabulary">
+      @for(s <- SchemaVocabulary.availableNames) {
+      	<option value="@s"
+      	 @{if(targetVocabulary==s) { "checked" }}>@s</option>
+      }
+    </select>
+    
 @submit()
 
 @hidden_inputs(vf)

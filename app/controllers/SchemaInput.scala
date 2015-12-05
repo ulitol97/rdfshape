@@ -2,6 +2,7 @@ package controllers
 
 // import es.weso.shex.{Schema => ShexSchema}
 import es.weso.shacl._
+import es.weso.shacl.SchemaProcessor._
 import es.weso.rdf._
 import es.weso.rdfgraph.nodes.RDFNode
 import es.weso.rdfgraph.nodes.IRI
@@ -19,16 +20,16 @@ case class SchemaInput(
     , schemaProcessor: SchemaProcessor
     ) {
   
-  def convertSchema(outputFormat: String): Try[String] = {
+  def convertSchema(targetLanguage: SchemaLanguage): Try[String] = {
     schemaProcessor match {
       case SHACL => // TODO: SHACL = Shexcala by now...remove in the future
         for { inputStr <- getSchemaStr
-            ; outStr <- ShaclConverter(inputStr, schemaLanguage.format, outputFormat)
+            ; outStr <- ShaclConverter(inputStr, schemaLanguage.format, targetLanguage)
             } 
         yield outStr
       case ShExcala =>
         for { inputStr <- getSchemaStr
-            ; outStr <- ShaclConverter(inputStr, schemaLanguage.format, outputFormat)
+            ; outStr <- ShaclConverter(inputStr, schemaLanguage.format, targetLanguage)
             } 
         yield outStr
       case SHACL_FPWD => {
@@ -42,12 +43,12 @@ case class SchemaInput(
   
   def ShaclConverter(str: String, 
       inputFormat: String, 
-      outputFormat: String): Try[String] = {
+      targetLanguage: SchemaLanguage): Try[String] = {
     if (str == "") Success("")
     else {
       for {
         (schema,pm) <- Schema.fromString(str,inputFormat)
-      } yield schema.serialize(outputFormat)
+      } yield schema.serialize(targetLanguage.format)
     }
   }
   
@@ -69,6 +70,15 @@ case class SchemaInput(
   def extract_str() : String = {
     this.getSchemaStr.getOrElse("")
   }
+  
+  def schemaVocabulary: SchemaVocabulary = {
+    schemaLanguage.vocabulary
+  }
+  
+  def inputFormat: String = {
+    schemaLanguage.format
+  }
+
 }
     
 object SchemaInput {
@@ -78,19 +88,24 @@ object SchemaInput {
              , schema_uri = ""
              , schema_file = None
              , schema_textarea = ""
-             , schemaLanguage = SchemaLanguages.default
-             , schemaProcessor = SchemaProcessors.default
+             , schemaLanguage = SchemaLanguage.default
+             , schemaProcessor = SchemaProcessor.default
              )
-    
-  def apply(str: String, format: String, vocab: String, processor: String): SchemaInput = 
+
+  def build(str: String, format: String, vocab: String, processor: String): Try[SchemaInput] =
+     for {
+       schemaLanguage <- SchemaLanguage.lookup(format,vocab)
+       schemaProcessor <- SchemaProcessor.lookup(processor)
+     } yield 
     SchemaInput( 
                input_type_Schema = ByInput
         	   , schema_uri = ""
         	   , schema_file = None
         	   , schema_textarea = str
-             , schemaLanguage = SchemaLanguages.get(format,vocab)
-             , schemaProcessor = SchemaProcessors.get(processor)
+             , schemaLanguage = schemaLanguage
+             , schemaProcessor = schemaProcessor
         	   )
+     
   def apply(str: String, language: SchemaLanguage, processor: SchemaProcessor): SchemaInput = 
     SchemaInput( 
                input_type_Schema = ByInput

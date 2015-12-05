@@ -1,6 +1,6 @@
 @(title: String)(vf:ValidationForm)(content: Html)
 
-@import es.weso.shacl.SchemaVersions
+@import es.weso.shacl._
 
 <!DOCTYPE html>
 <html>
@@ -48,7 +48,8 @@ Syntax checking
 <li><a href="@routes.Checker.schema(
             vf.schemaStr,
             vf.schemaFormat,
-            vf.schemaVersion)" 
+            vf.schemaVocabulary,
+            vf.schemaProcessor)" 
             >Schema Syntax</a></li>
 </ul>
 <li class="dropdown">Validation
@@ -57,19 +58,21 @@ Syntax checking
             vf.dataFormat,
             vf.schemaStr,
             vf.schemaFormat,
-            vf.schemaVersion)" 
+            vf.schemaVocabulary,
+            vf.schemaProcessor)" 
             >Data + Schema (separated)</a></li>
 <!-- <a href="@routes.Validator.dataSchemaNode(vf.dataStr,
             vf.dataFormat,
             vf.schemaStr,
             vf.schemaFormat,
-            vf.schemaVersion, 
+            vf.schemaVocabulary,
+            vf.schemaProcessor, 
             vf.focusNode)" 
             title="Validate a node in an RDf Data using a Schema (Find shapes)">Data + Schema + Node </a> -->
 <li><a href="@routes.Validator.data(
 			vf.dataStr,
 			vf.dataFormat,
-			vf.schemaVersion)" 
+			Some(vf.schemaProcessor))" 
             >
             Data & Schema (together)</a>
 </li>            
@@ -77,14 +80,16 @@ Syntax checking
 <li><a href="@routes.Validator.byEndpoint(
 			vf.schemaStr,
 			vf.schemaFormat,
-			vf.schemaVersion,
+            vf.schemaVocabulary,
+			vf.schemaProcessor,
 			vf.endpoint)" 
             >By endpoint</a>
 </li>
 <li><a href="@routes.Validator.byDereference(
 			vf.schemaStr,
 			vf.schemaFormat,
-			vf.schemaVersion,
+            vf.schemaVocabulary,
+			vf.schemaProcessor,
 			vf.focusNode)" 
             >By dereference</a>
 </li>
@@ -95,14 +100,16 @@ Syntax checking
 <li><a href="@routes.DataConverter.convert_data_get(
             data = vf.dataStr,
             inputFormat = vf.dataFormat,
-            outputFormat = "TURTLE" 
+            targetFormat = vf.dataFormat 
             )">RDF Conversions</a>
 </li>
 <li><a href="@routes.SchemaConverter.convert_schema_get(
 			schema = vf.schemaStr,
             inputFormat = vf.schemaFormat,
-            outputFormat = "SHEXC",
-            schemaVersion = vf.schemaVersion 
+            schemaVocabulary = vf.schemaVocabulary,
+            schemaProcessor = vf.schemaProcessor, 
+            targetFormat = vf.schemaFormat,
+			targetVocabulary = vf.schemaVocabulary
             )" 
             >Schema Conversions</a>
 </li>

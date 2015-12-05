@@ -174,7 +174,7 @@ object Multipart {
   def parseSchemaProcessor(mf: MultipartFormData[TemporaryFile]): Try[SchemaProcessor] = {
     for {
       schema_processor <- parseKey(mf,schemaProcessorKey)
-    ; schemaProcessor <- SchemaProcessors.lookup(schema_processor)
+    ; schemaProcessor <- SchemaProcessor.lookup(schema_processor)
     } yield schemaProcessor
   }
   
@@ -191,16 +191,15 @@ object Multipart {
         ; schema_uri <- parseKey(mf,schemaUriKey)
         ; schema_file <- parseFile(mf,schemaFileKey)
         ; schema_textarea <- parseKey(mf,schemaTextareaKey)
-        ; schema_format <- parseKey(mf,schemaFormatKey)
         ; schema_language <- parseSchemaLanguage(mf)
         ; schema_processor <- parseSchemaProcessor(mf)
         )
    yield
-     SchemaInput(input_type_schema,
+     SchemaInput(
+         input_type_schema,
          schema_uri, 
          schema_file, 
          schema_textarea, 
-         schema_format, 
          schema_language,
          schema_processor)
   }
@@ -209,11 +208,9 @@ object Multipart {
     for ( cut <- parseInt(mf,"cut",MIN_CUT,MAX_CUT)
         ; opt_iri <- parseOptIRI(mf)
         ; showSchema <- parseBoolean(mf,showSchemaKey)
-        ; schemaLanguage <- parseSchemaLanguage(mf)
-        ; schemaProcessor <- parseSchemaProcessor(mf)
         )
    yield
-     SchemaOptions(cut,opt_iri,showSchema,schemaLanguage,schemaProcessor)
+     SchemaOptions(cut,opt_iri,showSchema)
   }
 
   def parseBoolean(mf: MultipartFormData[TemporaryFile], key: String): Try[Boolean] = {

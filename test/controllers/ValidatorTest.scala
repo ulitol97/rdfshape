@@ -27,7 +27,11 @@ class ValidatorTest
       val rdfStr = """|@prefix : <http://example.org/> .
                    |:a :b :c . 
                    |""".stripMargin
-      val result = validator.data(data = rdfStr, dataFormat="TURTLE", schemaVersion="SHACL").apply(FakeRequest())
+      val result = 
+        validator.data(data = rdfStr, 
+            dataFormat="TURTLE", 
+            maybeProcessor=Some("ShExcala_0.1")
+            ).apply(FakeRequest())
       status(result) mustEqual OK    
       val bodyText : String = contentAsString(result)
       bodyText must include("@prefix : &lt;http://example.org/&gt;")

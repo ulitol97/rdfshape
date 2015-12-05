@@ -10,20 +10,25 @@ import es.weso.shacl.DataFormats
 
 object RDFUtils {
 
-  def RDFParse(str: String, format: String): Try[RDFReader] = {
+  lazy val defaultDataFormat: String = "TURTLE"
+
+  def parseRDF(str: String, format: String): Try[RDFReader] = {
     RDFAsJenaModel.fromChars(str,format) 
   }
 
-  def defaultDataFormat = "TURTLE"
+  def getFormat(maybeFormat: Option[String]): Try[String] = {
+    val format = maybeFormat.getOrElse(defaultDataFormat)
+    if (isAvailableFormat(format)) 
+       Try(format)
+    else  
+       Failure(throw new Exception("Unsupported RDF format " + format))
+  }
   
-  def getFormat(syntax: Option[String]): String = {
-    syntax match {
-      case Some(s) => 
-        if (DataFormats.available(s)) s
-        else // TODO: Check a better failure... 
-          throw new Exception("Unsupported syntax " + s)
-      case None => defaultDataFormat
-    }
-    
+  def isAvailableFormat(format: String): Boolean = {
+    DataFormats.available(format)
+  }
+  
+  def availableFormats: Seq[String] = {
+    DataFormats.formats
   }
 }

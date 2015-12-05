@@ -35,7 +35,7 @@ case class DataInput(
    input_type_Data match {
      case ByUri | ByFile | ByInput => 
        			 for ( str <- getDataStr
-                 ; rdf <- RDFParse(str,format)
+                 ; rdf <- parseRDF(str,format)
                  ) yield rdf
      case ByEndpoint => 
        if (data_endpoint == "") {
