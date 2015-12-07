@@ -15,7 +15,7 @@ object SchemaProcessor {
   val availableProcessors : List[SchemaProcessor] = 
     List(SHACL, ShExcala, SHACL_FPWD)
     
-  val availableNames : List[String]= 
+  val processorNames : List[String]= 
     availableProcessors.map(_.name)
 
   lazy val default = ShExcala
@@ -24,7 +24,7 @@ object SchemaProcessor {
   
   def lookup(key:String): Try[SchemaProcessor] = {
     availableProcessors.find(_.name == key) match {
-      case None => Failure(new Exception (s"Key $key not found in available schema versions: $availableNames"))
+      case None => Failure(new Exception (s"Key $key not found in available schema versions: $processorNames"))
       case Some(x) => Success(x)
     }
   }
@@ -33,13 +33,6 @@ object SchemaProcessor {
     availableProcessors.find(_.name == key).getOrElse(default)
   } */
   
-  def lookupOption(key: Option[String]): Try[SchemaProcessor] = {
-    if (key.isDefined) {
-      lookup(key.get)
-    } else {
-      Success(default)
-    }
-  }
   
 // This version is kept for compatibility reasons
 // It behaves as ShEx although it is called SHACL_0.1

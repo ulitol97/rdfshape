@@ -23,19 +23,19 @@
 	  enctype="multipart/form-data" 
 	  action="@routes.SchemaConverter.convert_schema_post">
 
-<label for="targetFormat">@Messages("Output.schema.format")</label>
+<label for="targetFormat">@Messages("Target.schema.format")</label>
     <select name="targetFormat">
-      @for(s <- SchemaLanguage.availableFormats) {
+      @for(s <- SchemaFormat.formatNames) {
       	<option value="@s"
-      	 @{if(targetFormat==s) { "checked" }}>@s</option>
+      	 @{if(targetFormat==s) { "selected" }}>@s</option>
       }
     </select>
 
-<label for="targetVocabulary">@Messages("Output.schema.vocabulary")</label>
+<label for="targetVocabulary">@Messages("Target.schema.vocabulary")</label>
     <select name="targetVocabulary">
-      @for(s <- SchemaVocabulary.availableNames) {
+      @for(s <- SchemaVocabulary.vocabularyNames) {
       	<option value="@s"
-      	 @{if(targetVocabulary==s) { "checked" }}>@s</option>
+      	 @{if(targetVocabulary==s) { "selected" }}>@s</option>
       }
     </select>
     

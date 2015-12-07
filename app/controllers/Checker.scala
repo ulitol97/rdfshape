@@ -23,6 +23,10 @@ import java.io.File
 import scala.util._
 import DataOptions._
 import SchemaOptions._
+import es.weso.shacl.SchemaFormat
+import es.weso.shacl.SchemaProcessor
+import es.weso.shacl.SchemaVocabulary
+import play.api.Logger
 
 
 trait Checker { this: Controller =>
@@ -31,15 +35,23 @@ trait Checker { this: Controller =>
 
   def data(data: String, dataFormat: String) = { 
     Validator.validate_get(data,
-        Some(dataFormat),
+        dataFormat,
         DEFAULT_SHOW_DATA,
-        None, None, None, None, None,
+        "", 
+        SchemaFormat.default.name, 
+        SchemaVocabulary.default.name, 
+        SchemaProcessor.default.name, 
+        None,
         DEFAULT_CUT,
         DEFAULT_ShowSchema)
   }
   
-  def schema(schema: String, schemaFormat: String, schemaVocabulary: String, schemaProcessor: String) = 
+  def schema(schema: String, 
+      schemaFormat: String, 
+      schemaVocabulary: String, 
+      schemaProcessor: String) = {
     Action.async {  
+     Logger.info(s"schemaFormat = $schemaFormat, vocab = $schemaVocabulary, processor=$schemaProcessor")
      schema_Future(schema,schemaFormat, schemaVocabulary, schemaProcessor).map(result => 
                result match {
                 case Success((str,schemaInput)) => {
@@ -50,6 +62,8 @@ trait Checker { this: Controller =>
                }
           )
     }
+  }
+    
 
   
   def schema_Future(

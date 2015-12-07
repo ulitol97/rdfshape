@@ -16,7 +16,7 @@ import es.weso.rdf._
 import es.weso.rdfgraph.nodes.IRI
 import es.weso.rdf.jena._
 import es.weso.monads.{Result => SchemaResult, Failure => SchemaFailure}
-import es.weso.shacl.{Schema => ShExSchema, SchemaFormats}
+import es.weso.shacl.{Schema => ShExSchema, SchemaFormat}
 import es.weso.utils.RDFUtils
 import es.weso.utils.RDFUtils._
 import es.weso.utils.TryUtils._
@@ -81,7 +81,7 @@ trait SchemaConverter { this: Controller =>
        case Success((schemaInput, targetLanguage,result)) => {
          Logger.info("Convert_schema_post: " + schemaInput)
          val vf = ValidationForm.fromSchemaConversion(schemaInput)
-         Ok(views.html.convert_schema(vf,targetLanguage.format, targetLanguage.vocabulary.name,result))
+         Ok(views.html.convert_schema(vf,targetLanguage.format.name, targetLanguage.vocabulary.name,result))
        }
        case Failure(e) => {
         Logger.info("Exception raised: " + e.getMessage)
@@ -92,7 +92,7 @@ trait SchemaConverter { this: Controller =>
   }
 
   def schemaFormats = Action {
-    Ok(Json.toJson(SchemaFormats.toList))
+    Ok(Json.toJson(SchemaFormat.toList))
   }
     
 }

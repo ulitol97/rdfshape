@@ -10,6 +10,9 @@ import java.io.File
 import es.weso.utils.IOUtils._
 import util._
 import es.weso.utils.SchemaUtils
+import es.weso.shacl.SchemaVocabulary
+import es.weso.shacl.SchemaProcessor
+import es.weso.shacl.SchemaLanguage
 
 case class SchemaInput(
       input_type_Schema: InputType
@@ -22,14 +25,14 @@ case class SchemaInput(
   
   def convertSchema(targetLanguage: SchemaLanguage): Try[String] = {
     schemaProcessor match {
-      case SHACL => // TODO: SHACL = Shexcala by now...remove in the future
+      case SchemaProcessor.SHACL => // TODO: SHACL = Shexcala by now...remove in the future
         for { inputStr <- getSchemaStr
-            ; outStr <- ShaclConverter(inputStr, schemaLanguage.format, targetLanguage)
+            ; outStr <- ShaclConverter(inputStr, schemaLanguage.format.name, targetLanguage)
             } 
         yield outStr
-      case ShExcala =>
+      case SchemaProcessor.ShExcala =>
         for { inputStr <- getSchemaStr
-            ; outStr <- ShaclConverter(inputStr, schemaLanguage.format, targetLanguage)
+            ; outStr <- ShaclConverter(inputStr, schemaLanguage.format.name, targetLanguage)
             } 
         yield outStr
       case SHACL_FPWD => {
@@ -48,7 +51,7 @@ case class SchemaInput(
     else {
       for {
         (schema,pm) <- Schema.fromString(str,inputFormat)
-      } yield schema.serialize(targetLanguage.format)
+      } yield schema.serialize(targetLanguage.format.name)
     }
   }
   
@@ -76,7 +79,7 @@ case class SchemaInput(
   }
   
   def inputFormat: String = {
-    schemaLanguage.format
+    schemaLanguage.format.name
   }
 
 }

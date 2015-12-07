@@ -40,12 +40,12 @@
 
 <a href="@routes.Validator.validate_get(
 	         vr.dataStr,
-	         Some(vr.dataFormat),
+	         vr.dataFormat,
 	         vr.showData,
-	         Some(vr.schemaStr),
-             Some(vr.schemaLanguage.format),
-             Some(vr.schemaLanguage.vocabulary.name),
-             Some(vr.schemaProcessor.name),
+	         vr.schemaStr,
+             vr.schemaLanguage.format.name,
+             vr.schemaLanguage.vocabulary.name,
+             vr.schemaProcessor.name,
 	         vr.maybeFocusNode,
 	         vr.cut,
 	         vr.showSchema

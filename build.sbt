@@ -15,7 +15,7 @@ lazy val root = (project in file(".")).enablePlugins(PlayScala).
 
 scalaVersion := "2.11.7"
 
-lazy val shExcalaVersion = "0.6.9"
+lazy val shExcalaVersion = "0.7.3"
 
 libraryDependencies ++= Seq(
   jdbc,
@@ -25,6 +25,7 @@ libraryDependencies ++= Seq(
 , "commons-io" % "commons-io" % "2.4"  
 , "org.apache.jena" % "jena-arq" % "2.10.1" excludeAll(ExclusionRule(organization = "org.slf4j"))
 , "postgresql" % "postgresql" % "9.1-901-1.jdbc4"
+, "org.scoverage" %% "scalac-scoverage-runtime" % "1.0.4"
 
 // ShExcala
 , "es.weso" % "shexcala_2.11" % shExcalaVersion excludeAll(ExclusionRule(organization = "org.slf4j")) 

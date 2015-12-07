@@ -3,7 +3,6 @@ package controllers
 import scala.concurrent._
 import scala.concurrent.duration._
 import akka.actor._
-
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import java.io.ByteArrayInputStream
 import org.apache.commons.io.FileUtils
@@ -23,6 +22,9 @@ import es.weso.shacl._
 import java.net.URL
 import java.io.File
 import play.api.Logger
+import es.weso.shacl.SchemaVocabulary
+import es.weso.shacl.SchemaProcessor
+import es.weso.shacl.SchemaLanguage
 
 object Multipart {
 
@@ -163,7 +165,14 @@ object Multipart {
       }
     }
   }
+  def parseSchemaFormat(mf: MultipartFormData[TemporaryFile]): Try[SchemaFormat] = {
+    for {
+      schema_format <- parseKey(mf,schemaFormatKey)
+    ; schemaFormat <- Try(SchemaFormat.lookup(schema_format).get)
+    } yield schemaFormat
+  }
   
+
   def parseSchemaVocabulary(mf: MultipartFormData[TemporaryFile]): Try[SchemaVocabulary] = {
     for {
       schema_vocabulary <- parseKey(mf,schemaVocabularyKey)
@@ -180,7 +189,7 @@ object Multipart {
   
   def parseSchemaLanguage(mf: MultipartFormData[TemporaryFile]): Try[SchemaLanguage] = {
     for {
-      schema_format <- parseKey(mf,schemaFormatKey)
+      schema_format <- parseSchemaFormat(mf)
     ; schema_vocab <- parseSchemaVocabulary(mf)
     } yield SchemaLanguage(schema_format,schema_vocab)
   }

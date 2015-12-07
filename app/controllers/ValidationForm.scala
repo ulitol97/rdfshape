@@ -79,7 +79,7 @@ case class ValidationForm(
  
  def schemaFormat: String = { 
    // Todo. there are 2 ways to get format...select one of them...discard the other...
-   schemaInput.schemaLanguage.format
+   schemaInput.schemaLanguage.format.name
  }
  
  def schemaProcessor : String = {

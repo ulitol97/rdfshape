@@ -13,6 +13,8 @@ import es.weso.utils.SchemaUtils
 import es.weso.shacl._
 import es.weso.rdf.validator.{ ValidationResult => ShaclResult, _ }
 import es.weso.typing._
+import es.weso.shacl.SchemaProcessor
+import es.weso.shacl.SchemaLanguage
 
 case class ValidationResult(
     status: Option[Boolean], 

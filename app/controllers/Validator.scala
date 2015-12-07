@@ -1,30 +1,21 @@
 package controllers
 
-import scala.concurrent._
-import scala.concurrent.duration._
-import akka.actor._
-
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import java.io.ByteArrayInputStream
-import org.apache.commons.io.FileUtils
-import play.api._
-import play.api.mvc._
-import play.api.libs.Files._
-import scala.util._
+import scala.Stream
 import scala.concurrent.Future
-import es.weso.rdf._
-import es.weso.rdfgraph.nodes.IRI
-import es.weso.rdf.jena._
-import es.weso.utils.CommonUtils._
-import es.weso.utils.RDFUtils
-import es.weso.utils.IOUtils._
-import java.net.URL
-import java.io.File
-import DataOptions._
+import util._
+
+import DataOptions.DEFAULT_SHOW_DATA
 import SchemaOptions._
+import es.weso.rdf._
+import es.weso.rdf.jena.RDFAsJenaModel
+import es.weso.rdfgraph.nodes.IRI
 import es.weso.shacl.{ Action => _, _}
 import es.weso.shacl.converter.RDF2Schema
-import es.weso.shacl.converter.Schema2RDF
+import es.weso.utils.CommonUtils._
+import es.weso.utils.RDFUtils
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import play.api.mvc._
+import play.api.Logger
 
 trait Validator { this: Controller =>
 
@@ -40,31 +31,42 @@ trait Validator { this: Controller =>
   def data(
     data: String,
     dataFormat: String,
-    maybeProcessor: Option[String]): Action[AnyContent] = {
+    schemaProcessor: String): Action[AnyContent] = {
+    
+    Logger.info(s"Trying to validate...$data with $dataFormat and $schemaProcessor")
     // Create a shapes graph and join it to the RDF data
     val rdf: RDFBuilder = RDFAsJenaModel.empty
     val trySchema = for {
-      format <-RDFUtils.getFormat(Some(dataFormat))
-      processor <- SchemaProcessor.lookup(maybeProcessor.getOrElse(SchemaProcessor.default.name))
+      format <- {
+        Logger.info("Getting format...")
+        RDFUtils.getFormat(dataFormat)
+      }
+      processor <- {
+        Logger.info(s"Format...$format")
+        SchemaProcessor.lookup(schemaProcessor)
+      }
       opts_data = DataOptions(format = format, showData = true)
       opts_schema = SchemaOptions.default
-      (schema, pm) <- Schema.fromString(data, dataFormat)
+      (schema, pm) <- {
+        Logger.info(s"...before parsing $data with $dataFormat, available: ${SchemaFormat.available(data)}")
+        Schema.fromString(data, dataFormat)
+      }
     } yield (schema, processor)
     trySchema match {
       case Success((schema,processor)) => {
         validate_get(data,
-          Some(dataFormat),
+          dataFormat,
           DEFAULT_SHOW_DATA,
-          Some(schema.serialize("SHEXC")),
-          Some("SHEXC"),
-          Some("SHEX"),
-          Some(processor.name),
+          schema.serialize(SchemaFormat.default.name),
+          SchemaFormat.default.name,
+          SchemaVocabulary.default.name,
+          processor.name,
           None,
           DEFAULT_CUT,
           DEFAULT_ShowSchema)
       }
       case Failure(e) =>
-        throw new Exception(s"data: unsupported failure: $e. Data: $data, $dataFormat")
+        Action { BadRequest(views.html.errorPage(e.getMessage)) }
       }
   }
 
@@ -76,12 +78,12 @@ trait Validator { this: Controller =>
     schemaVocabulary: String,
     schemaProcessor: String): Action[AnyContent] = {
     validate_get(data,
-      Some(dataFormat),
+      dataFormat,
       DEFAULT_SHOW_DATA,
-      Some(schema),
-      Some(schemaFormat),
-      Some(schemaVocabulary),
-      Some(schemaProcessor),
+      schema,
+      schemaFormat,
+      schemaVocabulary,
+      schemaProcessor,
       None,
       DEFAULT_CUT,
       DEFAULT_ShowSchema)
@@ -96,20 +98,20 @@ trait Validator { this: Controller =>
     schemaProcessor: String,
     node: String) = {
     validate_get(data,
-      Some(dataFormat),
+      dataFormat,
       DEFAULT_SHOW_DATA,
-      Some(schema),
-      Some(schemaFormat), Some(schemaVocabulary), Some(schemaProcessor), Some(node),
+      schema,
+      schemaFormat, schemaVocabulary, schemaProcessor, Some(node),
       DEFAULT_CUT,
       DEFAULT_ShowSchema)
   }
 
   def validate_rdf_get_Future(
     str_data: String,
-    formatData: Option[String],
+    formatData: String,
     showData: Boolean,
-    schemaVocabulary: Option[String],
-    schemaProcessor: Option[String],
+    schemaVocabulary: String,
+    schemaProcessor: String,
     opt_iri: Option[String],
     cut: Int,
     showSchema: Boolean): Future[Try[ValidationResult]] = {
@@ -120,8 +122,8 @@ trait Validator { this: Controller =>
         iri = opt_iri.map(str => IRI(str))
         opts_schema = SchemaOptions(cut = cut, opt_iri = iri, showSchema)
         rdf <- RDFUtils.parseRDF(str_data, format) 
-        processor <- SchemaProcessor.lookupOption(schemaProcessor)
-        language <- SchemaLanguage.lookupOption(formatData,schemaVocabulary)
+        processor <- SchemaProcessor.lookup(schemaProcessor)
+        language <- SchemaLanguage.lookup(formatData,schemaVocabulary)
         // TODO...do something different for SHACL
         (schema, pm) <- RDF2Schema.rdf2Schema(rdf)
       } yield 
@@ -140,25 +142,24 @@ trait Validator { this: Controller =>
 
   def validate_get_Future(
     str_data: String,
-    formatData: Option[String],
+    formatData: String,
     showData: Boolean,
-    opt_schema: Option[String],
-    schemaFormat: Option[String],
-    schemaVocabulary: Option[String],
-    schemaProcessor: Option[String],
+    schemaStr: String,
+    schemaFormat: String,
+    schemaVocabulary: String,
+    schemaProcessor: String,
     opt_iri: Option[String],
     cut: Int,
     showSchema: Boolean): Future[Try[ValidationResult]] = {
     val tryResult = for {
       format <- RDFUtils.getFormat(formatData) 
       opts_data = DataOptions(format = format, showData = showData)
-      withSchema = opt_schema.isDefined
+      withSchema = schemaStr != ""
       iri = opt_iri.map(str => IRI(str))
       opts_schema = SchemaOptions(cut = cut, opt_iri = iri, showSchema)
-      str_schema = opt_schema.getOrElse("")
       rdf <- RDFUtils.parseRDF(str_data, format) 
-      processor <- SchemaProcessor.lookupOption(schemaProcessor)
-      language <- SchemaLanguage.lookupOption(formatData,schemaVocabulary)
+      processor <- SchemaProcessor.lookup(schemaProcessor)
+      language <- SchemaLanguage.lookup(schemaFormat,schemaVocabulary)
         // TODO...do something different for SHACL
        (schema, pm) <- RDF2Schema.rdf2Schema(rdf)
     } yield 
@@ -167,7 +168,7 @@ trait Validator { this: Controller =>
               str_data,
               opts_data,
               withSchema,
-              str_schema,
+              schemaStr,
               language, 
               processor, 
               opts_schema)
@@ -178,10 +179,10 @@ trait Validator { this: Controller =>
   // TODO: Simplify this ugly code...long list of arguments
   def validate_get_old(
     str_data: String, 
-    dataFormat: Option[String], 
+    dataFormat: String, 
     showData: Boolean, 
-    opt_schema: Option[String], 
-    maybeSchemaFormat: Option[String], 
+    opt_schema: String, 
+    schemaFormat: String, 
     schemaVersion: String,
     opt_iri: Option[String], 
     cut: Int, 
@@ -191,9 +192,9 @@ trait Validator { this: Controller =>
       dataFormat,
       showData,
       opt_schema,
-      maybeSchemaFormat,
-      Some(SchemaVocabulary.ShEx.name),
-      Some(SchemaProcessor.ShExcala.name),
+      schemaFormat,
+      SchemaVocabulary.SHEX.name,
+      SchemaProcessor.ShExcala.name,
       opt_iri,
       cut,
       showSchema).map(vrf => {
@@ -210,12 +211,12 @@ trait Validator { this: Controller =>
   // TODO: Simplify this ugly code...long list of arguments
   def validate_get(
     str_data: String, 
-    dataFormat: Option[String], 
+    dataFormat: String, 
     showData: Boolean, 
-    opt_schema: Option[String], 
-    schemaFormat: Option[String], 
-    schemaVocabulary: Option[String],
-    schemaProcessor: Option[String],
+    opt_schema: String, 
+    schemaFormat: String, 
+    schemaVocabulary: String,
+    schemaProcessor: String,
     opt_iri: Option[String], 
     cut: Int, 
     showSchema: Boolean
@@ -243,10 +244,10 @@ trait Validator { this: Controller =>
   // TODO: Simplify this ugly code...long list of arguments
   def validate_rdf_get(
     str_data: String,
-    dataFormat: Option[String],
+    dataFormat: String,
     showData: Boolean,
-    schemaVocabulary: Option[String],
-    schemaProcessor: Option[String],
+    schemaVocabulary: String,
+    schemaProcessor: String,
     opt_iri: Option[String], 
     cut: Int, 
     showSchema: Boolean): Action[AnyContent] = Action.async {

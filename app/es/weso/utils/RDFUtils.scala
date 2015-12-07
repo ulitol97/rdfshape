@@ -6,7 +6,7 @@ import java.io.File
 import scala.util._
 import es.weso.rdf.jena.RDFAsJenaModel
 import es.weso.rdf._
-import es.weso.shacl.DataFormats
+import es.weso.shacl.DataFormat
 
 object RDFUtils {
 
@@ -15,20 +15,16 @@ object RDFUtils {
   def parseRDF(str: String, format: String): Try[RDFReader] = {
     RDFAsJenaModel.fromChars(str,format) 
   }
-
-  def getFormat(maybeFormat: Option[String]): Try[String] = {
-    val format = maybeFormat.getOrElse(defaultDataFormat)
-    if (isAvailableFormat(format)) 
-       Try(format)
-    else  
-       Failure(throw new Exception("Unsupported RDF format " + format))
+  
+  def getFormat(format: String): Try[String] = {
+    DataFormat.lookup(format).map(_.name)
   }
   
   def isAvailableFormat(format: String): Boolean = {
-    DataFormats.available(format)
+    DataFormat.available(format)
   }
   
   def availableFormats: Seq[String] = {
-    DataFormats.formats
+    DataFormat.formats.map(_.name)
   }
 }

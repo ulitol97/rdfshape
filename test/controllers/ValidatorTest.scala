@@ -30,7 +30,7 @@ class ValidatorTest
       val result = 
         validator.data(data = rdfStr, 
             dataFormat="TURTLE", 
-            maybeProcessor=Some("ShExcala_0.1")
+            schemaProcessor="ShExcala_0.1"
             ).apply(FakeRequest())
       status(result) mustEqual OK    
       val bodyText : String = contentAsString(result)

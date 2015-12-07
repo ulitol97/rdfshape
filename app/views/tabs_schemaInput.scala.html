@@ -42,25 +42,25 @@
 
 <label for="schema_format">@Messages("Schema.format")</label>
 <select name="schema_format">
-      @for(s <- SchemaLanguage.availableFormats) {
+      @for(s <- SchemaFormat.formatNames) {
       	<option value="@s"
-      	 @{if(vf.schemaInput.inputFormat==s) { "checked" }}>@s</option>
+      	 @{if(vf.schemaInput.inputFormat == s) { "selected" }}>@s</option>
       }
 </select>
 
 <label for="schema_vocabulary">@Messages("Schema.vocabulary")</label>
 <select name="schema_vocabulary">
-      @for(s <- SchemaVocabulary.availableVocabularies) {
+      @for(s <- SchemaVocabulary.vocabularyNames) {
       	<option value="@s"
-      	 @{if(vf.schemaInput.schemaVocabulary==s) { "checked" }}>@s</option>
+      	 @{if(vf.schemaInput.schemaVocabulary.name==s) { "selected" }}>@s</option>
       }
 </select>
 
 <label for="schema_processor">@Messages("Schema.processor")</label>
 <select name="schema_processor">
-      @for(s <- SchemaProcessor.availableProcessors) {
+      @for(s <- SchemaProcessor.processorNames) {
       	<option value="@s"
-      	 @{if(vf.schemaInput.schemaProcessor==s) { "checked" }}>@s</option>
+      	 @{if(vf.schemaInput.schemaProcessor.name==s) { "selected" }}>@s</option>
       }
 </select>
 
