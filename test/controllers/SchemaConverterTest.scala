@@ -30,7 +30,7 @@ class ConverterSchemaTest
       val result = SchemaConverter.convert_schema_get(
           schema = schemaStr,
           inputFormat="SHEXC",
-          schemaProcessor="ShExcala_0.1",
+          schemaProcessor="SHEXCALA_0.1",
           schemaVocabulary="SHEX",
           targetFormat="TURTLE",
           targetVocabulary="SHEX"          
@@ -56,8 +56,10 @@ class ConverterSchemaTest
                , "schema_file" -> List("file")
                , "schema_textarea" -> List(schemaStr)
                , "schema_format" -> List("SHEXC")
-               , "schema_version" -> List("SHACL_0.1")
-               , "outputFormat" -> List("TURTLE")
+               , "schema_vocabulary" -> List("SHEX")
+               , "schema_processor" -> List("SHEXCALA_0.1")
+               , "targetFormat" -> List("TURTLE")
+               , "targetVocabulary" -> List("SHEX")
                ),
            List(FilePart("file", "message", Some("Content-Type: multipart/form-data"), 
                         play.api.libs.Files.TemporaryFile(new java.io.File("/tmp/pepe.txt")))), 

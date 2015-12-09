@@ -28,7 +28,8 @@ class ValidatorTest
                    |:a :b :c . 
                    |""".stripMargin
       val result = 
-        validator.data(data = rdfStr, 
+        validator.data(
+            data = rdfStr, 
             dataFormat="TURTLE", 
             schemaProcessor="ShExcala_0.1"
             ).apply(FakeRequest())
@@ -66,7 +67,7 @@ class ValidatorTest
       bodyText must include("RDF parsed")
       }
     
-    "validate bad formed RDF" in {
+    "not validate bad formed RDF" in {
       val validator = new ValidatorController()
       val rdfStr = """|@prefix : <http://example.org/> .
                    |:a :b 
@@ -134,5 +135,5 @@ class ValidatorTest
     }
     }
     
-  }
+  } 
 }

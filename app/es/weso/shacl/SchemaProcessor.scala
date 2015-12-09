@@ -23,23 +23,20 @@ object SchemaProcessor {
   lazy val defaultSchemaProcessor = default.name
   
   def lookup(key:String): Try[SchemaProcessor] = {
-    availableProcessors.find(_.name == key) match {
+    val keyUpper = key.toUpperCase
+    availableProcessors.find(_.name == keyUpper) match {
       case None => Failure(new Exception (s"Key $key not found in available schema versions: $processorNames"))
       case Some(x) => Success(x)
     }
   }
-  
-/*  def get(key:String): SchemaProcessor = {
-    availableProcessors.find(_.name == key).getOrElse(default)
-  } */
   
   
 // This version is kept for compatibility reasons
 // It behaves as ShEx although it is called SHACL_0.1
 object SHACL extends SchemaProcessor("SHACL_0.1")
 
-// This is ShEx based on ShExcala
-object ShExcala extends SchemaProcessor("ShExcala") 
+// First version of ShExcala
+object ShExcala extends SchemaProcessor("SHEXCALA_0.1") 
 
 // SHACL as published in FPWD
 // This is based on TopQuadrant implementation

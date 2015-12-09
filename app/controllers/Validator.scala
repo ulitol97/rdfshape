@@ -16,6 +16,8 @@ import es.weso.utils.RDFUtils
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.mvc._
 import play.api.Logger
+import es.weso.rdf.jena.Endpoint
+import es.weso.rdf.RDFReader
 
 trait Validator { this: Controller =>
 
@@ -33,18 +35,12 @@ trait Validator { this: Controller =>
     dataFormat: String,
     schemaProcessor: String): Action[AnyContent] = {
     
-    Logger.info(s"Trying to validate...$data with $dataFormat and $schemaProcessor")
+    Logger.info(s"Trying to validate. Format: $dataFormat, Processor: $schemaProcessor, Data:\n+ $data\n")
     // Create a shapes graph and join it to the RDF data
     val rdf: RDFBuilder = RDFAsJenaModel.empty
     val trySchema = for {
-      format <- {
-        Logger.info("Getting format...")
-        RDFUtils.getFormat(dataFormat)
-      }
-      processor <- {
-        Logger.info(s"Format...$format")
-        SchemaProcessor.lookup(schemaProcessor)
-      }
+      format <- RDFUtils.getFormat(dataFormat)
+      processor <- SchemaProcessor.lookup(schemaProcessor)
       opts_data = DataOptions(format = format, showData = true)
       opts_schema = SchemaOptions.default
       (schema, pm) <- {
@@ -65,9 +61,12 @@ trait Validator { this: Controller =>
           DEFAULT_CUT,
           DEFAULT_ShowSchema)
       }
-      case Failure(e) =>
-        Action { BadRequest(views.html.errorPage(e.getMessage)) }
+      case Failure(e) => {
+        Logger.error(s"Error validating: $e") 
+        Action { BadRequest(views.html.errorPage(e.getMessage))
       }
+     }
+   }
   }
 
   def dataSchema(
@@ -125,7 +124,7 @@ trait Validator { this: Controller =>
         processor <- SchemaProcessor.lookup(schemaProcessor)
         language <- SchemaLanguage.lookup(formatData,schemaVocabulary)
         // TODO...do something different for SHACL
-        (schema, pm) <- RDF2Schema.rdf2Schema(rdf)
+        // (schema, pm) <- RDF2Schema.rdf2Schema(rdf)
       } yield 
          ValidationResult.validate(
             rdf,
@@ -160,8 +159,6 @@ trait Validator { this: Controller =>
       rdf <- RDFUtils.parseRDF(str_data, format) 
       processor <- SchemaProcessor.lookup(schemaProcessor)
       language <- SchemaLanguage.lookup(schemaFormat,schemaVocabulary)
-        // TODO...do something different for SHACL
-       (schema, pm) <- RDF2Schema.rdf2Schema(rdf)
     } yield 
      ValidationResult.validate(
               rdf,
@@ -321,11 +318,31 @@ trait Validator { this: Controller =>
   }
   
   def byEndpoint(
-    schema: String,
+    schemaStr: String,
     schemaFormat: String,
     schemaVocabulary: String, 
     schemaProcessor: String, 
-    endpoint: String): Action[AnyContent] = Action { requesr => 
+    endpoint: String,
+    opt_iri: Option[String],
+    cut: Int,
+    showSchema: Boolean): Action[AnyContent] = Action { request =>
+      val rdf : RDFReader = Endpoint(endpoint)
+      val withSchema = true
+      val dataOptions = DataOptions(format = "TURTLE", showData = false)
+      val iri = opt_iri.map(str => IRI(str))
+      val schemaOptions = SchemaOptions(cut = cut, opt_iri = iri, showSchema)
+      val tryResult : Try[ValidationResult] = for {
+        processor <- SchemaProcessor.lookup(schemaProcessor)
+        language <- SchemaLanguage.lookup(schemaFormat,schemaVocabulary)
+      } yield ValidationResult.validate(rdf,
+              "",
+              dataOptions,
+              withSchema,
+              schemaStr,
+              language, 
+              processor, 
+              schemaOptions)
+    
     BadRequest(views.html.errorPage("This option is currently under maintenance"))
   }
 
