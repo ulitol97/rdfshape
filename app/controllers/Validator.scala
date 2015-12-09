@@ -299,6 +299,41 @@ trait Validator { this: Controller =>
       }
     }
   }
+  
+    def validateEndpoint_post = Action.async { request =>
+    {
+      val pair = for (
+        vf <- getValidationForm(request); 
+        str_data <- vf.dataInput.getDataStr
+      ) yield (vf, str_data)
+
+      scala.concurrent.Future {
+        pair match {
+          case Success((vf, str_data)) => {
+            val tryValidate =
+              for (
+                data <- vf.dataInput.getData(vf.dataOptions.format); 
+                str_schema <- vf.schemaInput.getSchemaStr
+              ) yield {
+                ValidationResult.validate(
+                  data,
+                  str_data,
+                  vf.dataOptions,
+                  vf.withSchema,
+                  str_schema,
+                  vf.schemaInput.schemaLanguage,
+                  vf.schemaInput.schemaProcessor,
+                  vf.schemaOptions)
+              }
+            val vr = getWithRecoverFunction(tryValidate, recoverValidationResult(str_data, vf))
+            Ok(views.html.index(vr, vf))
+          }
+          case Failure(e) => BadRequest(views.html.errorPage(e.getMessage))
+        }
+      }
+    }
+  }
+
 
   def recoverValidationResult(str_data: String, vf: ValidationForm)(e: Throwable): ValidationResult = {
     val schema_str: String = Try(vf.schemaInput.getSchemaStr.get).getOrElse("")
@@ -326,6 +361,9 @@ trait Validator { this: Controller =>
     opt_iri: Option[String],
     cut: Int,
     showSchema: Boolean): Action[AnyContent] = Action { request =>
+      if (endpoint == "") {
+        Ok(views.html.validate_endpoint(ValidationResult.empty,ValidationForm()))          
+      } else {
       val rdf : RDFReader = Endpoint(endpoint)
       val withSchema = true
       val dataOptions = DataOptions(format = "TURTLE", showData = false)
@@ -342,10 +380,18 @@ trait Validator { this: Controller =>
               language, 
               processor, 
               schemaOptions)
-    
-    BadRequest(views.html.errorPage("This option is currently under maintenance"))
+  
+    tryResult match {
+        case Success(vr) => {
+          val vf = ValidationForm.fromResult(vr)
+          Ok(views.html.validate_endpoint(vr,vf))
+        }
+        case Failure(e) => 
+          BadRequest(views.html.errorPage(e.getMessage))
+    }
+  }    
   }
-
+  
   def byDereference(
     schema: String,
     schemaFormat: String,

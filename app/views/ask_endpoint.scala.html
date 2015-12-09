@@ -1,0 +1,14 @@
+@(opt_endpoint: Option[String])
+
+<div class="content" id="endpoint">
+<h1>Endpoint</h1>
+<input type="url" 
+	   name="endpoint" 
+	   size="45" 
+	   value='@opt_endpoint.getOrElse("")'
+	   placeholder="http://..." />
+		 
+
+</div> 
+
+

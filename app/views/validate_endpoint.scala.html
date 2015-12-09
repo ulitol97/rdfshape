@@ -1,0 +1,30 @@
+@(vr: ValidationResult,
+  vf: ValidationForm)
+
+@import play.api.i18n.Messages
+
+@main("Validate by Endpoint")(vf) {
+
+@validationResult(vr)
+
+<h1>@Messages("Endpoint")</h1>
+
+
+<form method="post" 
+	  enctype="multipart/form-data" 
+	  action="@routes.Validator.validateEndpoint_post">
+
+@submit()
+
+@hidden_inputs(vf)
+
+@ask_endpoint(None)
+
+@ask_node(None)
+
+@tabs_schema(vf)
+
+</form>	
+
+
+}
