@@ -1,7 +1,8 @@
 @(vr: ValidationResult,
   vf: ValidationForm)
 
-@import play.api.i18n.Messages
+@import play.api.Play.current
+@import play.api.i18n.Messages.Implicits._
 
 @main("Validate RDF Data with Schema")(vf) {
 

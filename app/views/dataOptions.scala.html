@@ -1,6 +1,7 @@
 @(dataOptions: DataOptions)
 
-@import play.api.i18n.Messages
+@import play.api.Play.current
+@import play.api.i18n.Messages.Implicits._
 
 <fieldset>
 <legend>@Messages("Data.options")</legend>

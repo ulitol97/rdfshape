@@ -1,7 +1,8 @@
 @(vr: ValidationResult = ValidationResult.empty,
   vf: ValidationForm = ValidationForm() )
 
-@import play.api.i18n.Messages
+@import play.api.Play.current
+@import play.api.i18n.Messages.Implicits._
 
 @main("Index")(vf) {
 

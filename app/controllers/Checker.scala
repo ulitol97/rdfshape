@@ -29,7 +29,7 @@ import es.weso.shacl.SchemaVocabulary
 import play.api.Logger
 
 
-trait Checker { this: Controller =>
+class Checker extends Controller {
 
   import Multipart._
 
@@ -102,4 +102,3 @@ trait Checker { this: Controller =>
 
 }
 
-object Checker extends Controller with Checker

@@ -19,7 +19,7 @@ import play.api.Logger
 import es.weso.rdf.jena.Endpoint
 import es.weso.rdf.RDFReader
 
-trait Validator { this: Controller =>
+class Validator extends Controller {
 
   import Multipart._
 
@@ -403,4 +403,4 @@ trait Validator { this: Controller =>
 
 }
 
-object Validator extends Controller with Validator 
+object Validator extends Validator 

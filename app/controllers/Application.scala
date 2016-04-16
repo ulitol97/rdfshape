@@ -7,8 +7,7 @@ import buildinfo._
 
 // We use traits instead of objects to be able to test them
 // More info: https://www.playframework.com/documentation/2.3.x/ScalaTestingWithScalaTest
-trait Application {
-  this: Controller =>
+class Application extends Controller {
 
   lazy val name = "RDFShape" 
   lazy val shexcalaName = BuildInfo.name + "(" + BuildInfo.version + ")" 
@@ -26,5 +25,3 @@ trait Application {
   }
     
 }
-
-object Application extends Controller with Application

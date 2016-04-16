@@ -17,9 +17,11 @@ scalaVersion := "2.11.7"
 
 lazy val shExcalaVersion = "0.7.4"
 
+routesGenerator := StaticRoutesGenerator
+
 libraryDependencies ++= Seq(
   jdbc,
-  anorm,
+//  anorm,
   cache,
   ws
 , "commons-io" % "commons-io" % "2.4"  

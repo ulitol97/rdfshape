@@ -11,7 +11,7 @@ import play.api.libs.json.Json
 import play.api.mvc.Action
 import play.api.mvc.Controller
 
-trait DataConverter { this: Controller => 
+class DataConverter extends Controller { 
 
  def converterDataFuture(
           data: String
@@ -62,4 +62,3 @@ trait DataConverter { this: Controller =>
    
 }
 
-object DataConverter extends Controller with DataConverter

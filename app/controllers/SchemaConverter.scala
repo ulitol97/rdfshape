@@ -27,7 +27,7 @@ import es.weso.utils.IOUtils._
 import Multipart._
 import play.api.libs.json._
 
-trait SchemaConverter { this: Controller => 
+class SchemaConverter extends Controller { 
   
  lazy val targetFormatKey = "targetFormat"
  lazy val targetVocabularyKey = "targetVocabulary"
@@ -97,4 +97,3 @@ trait SchemaConverter { this: Controller =>
     
 }
 
-object SchemaConverter extends Controller with SchemaConverter
