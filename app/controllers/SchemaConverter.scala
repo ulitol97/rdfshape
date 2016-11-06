@@ -1,16 +1,20 @@
 package controllers
 
-import scala.concurrent.Future
-import scala.util.{ Failure => TryFailure, Success => TrySuccess, Try }
+import javax.inject.{Inject, Singleton}
 
-import Multipart.{ getMultipartForm, parseKey, parseSchemaInput }
+import scala.concurrent.Future
+import scala.util.{Try, Failure => TryFailure, Success => TrySuccess}
+import Multipart.{getMultipartForm, parseKey, parseSchemaInput}
 import play.api.Logger
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json.Json
-import play.api.mvc.{ Action, Controller }
+import play.api.mvc.{Action, Controller}
 import es.weso.schema._
+import play.api.i18n.{I18nSupport, MessagesApi}
 
-trait SchemaConverter { this: Controller => 
+@Singleton
+class SchemaConverter @Inject()(implicit val webJarAssets: WebJarAssets,
+                                val messagesApi: MessagesApi) extends Controller with I18nSupport {
 
  def converterSchemaFuture(
           schema: String
@@ -29,7 +33,7 @@ trait SchemaConverter { this: Controller =>
         , schemaVersion: String
         , outputFormat: String
         ) = Action.async {  
-        converterSchemaFuture(schema,inputFormat, schemaVersion,outputFormat).map(output => {
+        converterSchemaFuture(schema, inputFormat, schemaVersion, outputFormat).map(output => {
               output match {
                 case TrySuccess(result) => {
                   val schemaInput = SchemaInput(schema,inputFormat,schemaVersion)
@@ -68,4 +72,3 @@ trait SchemaConverter { this: Controller =>
     
 }
 
-object SchemaConverter extends Controller with SchemaConverter

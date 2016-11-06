@@ -1,6 +1,4 @@
-@(msg: String)
-
-@import play.api.i18n.Messages
+@(msg: String)(implicit messages: Messages, webJarAssets: WebJarAssets)
 
 @main("Index")(ValidationForm()) {
 

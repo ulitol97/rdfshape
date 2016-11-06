@@ -113,7 +113,7 @@ object ValidationForm {
           dataInput = DataInput()
         , dataOptions = DataOptions.default
         , withSchema = false
-        , schemaInput = SchemaInput(Schemas.defaultSchemaName)
+        , schemaInput = SchemaInput(HTMLSchemas.defaultSchemaName)
         , schemaOptions = SchemaOptions.default
         )
         

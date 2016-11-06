@@ -30,9 +30,10 @@ object DataConverterTest extends PlaySpecification with Results {
                    |:a :b :c . 
                    |""".stripMargin
       val result = converter.convert_data_get(
-          data = rdfStr,
-          dataFormat="TURTLE", 
-          outputFormat="N-TRIPLES").apply(FakeRequest())
+        data = rdfStr,
+        dataFormat="TURTLE",
+        targetFormat="N-TRIPLES",
+        schemaName = "ShEx").apply(FakeRequest())
       status(result) mustEqual OK    
       }
   }

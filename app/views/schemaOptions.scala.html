@@ -1,6 +1,6 @@
-@(schemaOptions: SchemaOptions, nodes:List[String], shapes: List[String])
+@(schemaOptions: SchemaOptions, nodes:List[String], shapes: List[String])(
+   implicit messages: Messages, webJarAssets: WebJarAssets)
 
-@import play.api.i18n.Messages
 @import es.weso.schema.ValidationTrigger
 
 <fieldset>

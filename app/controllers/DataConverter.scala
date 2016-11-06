@@ -2,32 +2,39 @@ package controllers
 
 import play.api._
 import play.api.mvc._
+
 import scala.concurrent._
 import akka.actor._
-
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import java.io.ByteArrayInputStream
+
 import play.api._
 import play.api.mvc._
 import play.api.libs.Files._
 import es.weso.shex.Schema
-import es.weso.shex.DataFormat
-import scala.util.{Try, Success => TrySuccess, Failure => TryFailure}
+import es.weso.schema.DataFormat
+
+import scala.util.{Try, Failure => TryFailure, Success => TrySuccess}
 import es.weso.rdf._
 import es.weso.rdf.nodes.IRI
 import es.weso.rdf.jena._
-import es.weso.monads.{Result => SchemaResult, Failure => SchemaFailure}
+import es.weso.monads.{Failure => SchemaFailure, Result => SchemaResult}
 import es.weso.utils._
 import es.weso.utils.TryUtils._
 import es.weso.utils.RDFUtils._
 import java.net.URL
 import java.io.File
+import javax.inject.{Inject, Singleton}
+
 import es.weso.utils.IOUtils._
 import Multipart._
 import play.api.libs.json._
 import es.weso.schema._
+import play.api.i18n.{I18nSupport, MessagesApi}
 
-trait DataConverter { this: Controller => 
+@Singleton
+class DataConverter @Inject()(implicit val webJarAssets: WebJarAssets,
+                              val messagesApi: MessagesApi) extends Controller with I18nSupport {
 
  def converterDataFuture(
           data: String
@@ -81,4 +88,3 @@ trait DataConverter { this: Controller =>
    
 }
 
-object DataConverter extends Controller with DataConverter

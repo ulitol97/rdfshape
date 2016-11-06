@@ -1,12 +1,16 @@
 package controllers
 
+import javax.inject.{Inject, Singleton}
+
 import play.api.Play.current
+import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json.Json
 import play.api.libs.ws.WS
-import play.api.mvc.{ Action, AnyContent, Controller }
+import play.api.mvc.{Action, AnyContent, Controller}
 
-trait ShExJs{ this: Controller =>
+@Singleton
+class ShExJs @Inject()(val messagesApi: MessagesApi) extends Controller with I18nSupport {
 
   val endpoint = "http://localhost:4290/validate"
   
@@ -49,4 +53,3 @@ trait ShExJs{ this: Controller =>
 
 }
 
-object ShExJs extends Controller with ShExJs

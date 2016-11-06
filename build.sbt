@@ -1,11 +1,11 @@
 
-name := """rdfshape"""
+name := "rdfshape"
 
 version := "1.0.2"
 
 scalacOptions ++= Seq("-deprecation", "-feature")
 
-lazy val root = (project in file(".")).enablePlugins(PlayScala).
+lazy val rdfshape = (project in file(".")).enablePlugins(PlayScala).
   enablePlugins(BuildInfoPlugin).
   settings(
     buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion),
@@ -26,13 +26,13 @@ libraryDependencies ++= Seq(
 
 // ShExcala
 //, "es.weso" % "shexcala_2.11" % "0.7.12" excludeAll(ExclusionRule(organization = "org.slf4j")) 
-, "es.weso" % "shaclex_2.11" % "0.0.4" excludeAll(ExclusionRule(organization = "org.slf4j")) 
+, "es.weso" % "shaclex_2.11" % "0.0.52" excludeAll(ExclusionRule(organization = "org.slf4j"))
 , "es.weso" % "shacl_tq_2.11" % "0.0.11" excludeAll(ExclusionRule(organization = "org.slf4j")) 
 
 // , "org.scalatest" %% "scalatest" % "2.2.4" % "test"
-, "org.scalatestplus" %% "play" % "1.2.0" % "test"
+, "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.0" % "test"
 , "org.seleniumhq.selenium" % "selenium-java" % "2.35.0" % "test"
-, "org.webjars" %% "webjars-play" % "2.3.0"
+, "org.webjars" %% "webjars-play" % "2.5.0"
 , "org.webjars" % "jquery" % "1.11.1"
 , "org.webjars" % "jquery-ui" % "1.11.4"
 , "org.webjars" % "jquery-ui-themes" % "1.11.4"

@@ -4,11 +4,10 @@ import es.weso.rdf.nodes._
 import es.weso.rdf.jena.RDFAsJenaModel
 import org.scalactic._
 import es.weso.shacl.{Schema => ShaclSchema, _}
-import es.weso.shex.DataFormat
-import es.weso.validating._
+// import es.weso.validating._
 import util._
 
-case class Shaclex(schema: ShaclSchema) extends Schema {
+/*case class Shaclex(schema: ShaclSchema) extends Schema {
   override def name = "SHACLex"
   
   override def formats = DataFormat.formatNames
@@ -42,13 +41,13 @@ case class Shaclex(schema: ShaclSchema) extends Schema {
     val msg = 
       if (result.isOK) s"Valid. Reason: ${result.reasons}"
       else "Not Valid" 
-    val solutions: Seq[Solution] = Seq()
-    val errors: Seq[ErrorInfo] = result.errors.map(constraintError2ErrorInfo(_))
+    val solutions: Seq[HTMLSolution] = Seq()
+    val errors: Seq[HTMLErrorInfo] = result.errors.map(constraintError2ErrorInfo(_))
     Result(isValid,msg,solutions,errors)
   }
   
-  def constraintError2ErrorInfo(ce: ConstraintError): ErrorInfo = {
-    ErrorInfo(ce.toString)
+  def constraintError2ErrorInfo(ce: ConstraintError): HTMLErrorInfo = {
+    HTMLErrorInfo(ce.toString)
   }
   
   override def fromString(cs: CharSequence, format: String, base: Option[String]): Try[Schema] = {
@@ -91,3 +90,4 @@ object Shaclex {
   }
   
 }
+*/

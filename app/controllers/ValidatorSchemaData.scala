@@ -1,14 +1,16 @@
 package controllers
 
+import javax.inject.{Inject, Singleton}
+
 import scala.Stream
 import scala.concurrent.Future
 import util._
-
 import DataOptions.DEFAULT_SHOW_DATA
-import SchemaOptions.{ DEFAULT_CUT, DEFAULT_ShowSchema }
-import es.weso.rdf.{ PrefixMap, RDFBuilder }
+import SchemaOptions.{DEFAULT_CUT, DEFAULT_ShowSchema}
+import es.weso.rdf.{PrefixMap, RDFBuilder}
 import es.weso.rdf.jena.RDFAsJenaModel
 import es.weso.rdf.nodes.IRI
+import play.api.i18n.{I18nSupport, MessagesApi}
 // import es.weso.schema.SchemaUtils
 // import es.weso.shex.{ Schema => ShExSchema, SchemaFormat => ShExSchemaFormat}
 // import es.weso.shex.converter.RDF2Schema
@@ -22,8 +24,10 @@ import play.api.mvc.{ Action, AnyContent, Controller }
 /**
  * Schema and Data separated
  */
-trait ValidatorSchemaData { this: Controller =>
-  
+@Singleton
+class ValidatorSchemaData @Inject()(implicit val webJarAssets: WebJarAssets,
+                                    val messagesApi: MessagesApi) extends Controller with I18nSupport {
+
   import Multipart._
 
   def dataSchema(
@@ -202,4 +206,3 @@ trait ValidatorSchemaData { this: Controller =>
 
 }
 
-object ValidatorSchemaData extends Controller with ValidatorSchemaData 

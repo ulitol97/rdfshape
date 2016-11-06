@@ -11,7 +11,7 @@ import es.weso.rdf._
 import views.html.helper.input
 import es.weso.rdf.jena._
 import es.weso.utils._
-import es.weso.shex.DataFormat
+import es.weso.schema.DataFormat
 import es.weso.rdf.jena.RDFAsJenaModel
 
 

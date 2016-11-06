@@ -6,15 +6,16 @@ import scala.util.{Try,
   Failure => TryFailure, 
   Success => TrySuccess}
 import java.io.File
+import scala.io._
 
 object IOUtils {
     def getURI(uri:String): Try[String] = {
     try {
       Logger.info("Trying to reach " + uri)
-      val str = io.Source.fromURL(new URL(uri)).getLines().mkString("\n")
+      val str = Source.fromURL(new URL(uri)).getLines().mkString("\n")
       TrySuccess(str)
     } catch {
-    case e: Exception => TryFailure(throw new Exception("getURI: cannot retrieve content from " + uri + "\nException: " + e.getMessage))
+    case e: Exception => TryFailure(new Exception("getURI: cannot retrieve content from " + uri + "\nException: " + e.getMessage))
     }
   } 
 
@@ -23,11 +24,11 @@ object IOUtils {
      opt_file match {
          case Some(file) => {
            try {
-            val str = io.Source.fromFile(file).getLines().mkString("\n")
+            val str = Source.fromFile(file).getLines().mkString("\n")
             TrySuccess(str)
            }
            catch {
-             case e: Exception => TryFailure(throw new Exception("getFileContents: cannot retrieve content from file " + file + "\nException: " + e.getMessage))
+             case e: Exception => TryFailure(new Exception("getFileContents: cannot retrieve content from file " + file + "\nException: " + e.getMessage))
            }
          } 
      case None => {

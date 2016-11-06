@@ -7,6 +7,9 @@ import es.weso.rdf.nodes.{ IRI, RDFNode }
 import es.weso.schema._
 import play.Logger
 import es.weso.rdf.PrefixMap
+import es.weso.utils.ShowHTML
+import es.weso.utils.ShowHTML._
+import es.weso.schema.ShowHTMLImplicits._
 
 case class ValidationResult(
     status: Option[Boolean],  // 
@@ -35,12 +38,12 @@ case class ValidationResult(
     else None
   }
 
-  def getSchema: Try[Schema] = {
+  def getSchema: Try[HTMLSchema] = {
     for {
-      schema <- Schemas.fromString(schemaStr,schemaFormat,schemaName,None)
+      schema <- HTMLSchemas.fromString(schemaStr,schemaFormat,schemaName,None)
     } yield schema
   }
-  
+
   def pm: PrefixMap = {
     getSchema.map(_.pm).getOrElse(PrefixMap.empty)
   }
@@ -60,7 +63,11 @@ case class ValidationResult(
   
   def toHTML: String = {
     getSchema match {
-      case Success(schema) => result.toHTML(schemaOptions.cut,schema)
+      case Success(schema) => {
+        val showResult = ShowHTMLImplicits(schema)
+        implicit val showHtmlResult = showResult.resultHTML
+        showHtmlResult.showHTML(result)
+      }
       case Failure(e) => "Exception trying to get schema " + e.getMessage
     }
   }
@@ -73,7 +80,8 @@ object ValidationResult {
   /**
    * Empty validation result
    */
-  def empty =
+  def empty = {
+    println(s"Empty validation result: schemaName=${HTMLSchemas.defaultSchemaName}")
     ValidationResult(
       status = None,
       msg = "",
@@ -84,11 +92,11 @@ object ValidationResult {
       withSchema = false,
       schemaStr = "",
       schemaFormat = SchemaUtils.defaultSchemaFormat,
-      schemaName = Schemas.defaultSchemaName,
+      schemaName = HTMLSchemas.defaultSchemaName,
       schemaOptions = SchemaOptions.default,
       together = DefaultTogether
-      )
-
+    )
+  }
   /**
    * Creates a validation result when validating against an IRI
    */
@@ -233,10 +241,10 @@ object ValidationResult {
     schemaFormat: String, 
     schemaName: String, 
     schemaOptions: SchemaOptions): ValidationResult = {
-    println(s"ValidationResult.validate. withSchema: $withSchema schemaName: $schemaName")
+    println(s"ValidationResult. validateDataSchema. withSchema?: $withSchema\nschemaName: $schemaName")
 
     if (withSchema) {
-      Schemas.fromString(schemaStr,schemaFormat,schemaName,None) match {
+      HTMLSchemas.fromString(schemaStr,schemaFormat,schemaName,None) match {
         case Success(schema) =>
           validate_withSchema(rdf,dataStr,dataOptions,schema,schemaStr,schemaFormat,schemaName,schemaOptions)
         case Failure(e) => {
@@ -263,7 +271,7 @@ object ValidationResult {
     rdf: RDFReader, 
     dataStr: String, 
     dataOptions: DataOptions, 
-    schema: Schema, 
+    schema: HTMLSchema,
     schemaStr: String,
     schemaFormat: String,
     schemaName: String,

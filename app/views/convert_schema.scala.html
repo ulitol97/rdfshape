@@ -1,6 +1,5 @@
-@(vf:ValidationForm, outputFormat: String, result: String)
-
-@import play.api.i18n.Messages
+@(vf:ValidationForm, outputFormat: String, result: String)(implicit messages: Messages,
+   webJarAssets: WebJarAssets)
 
 @main(Messages("Convert.Schema"))(vf) {
 

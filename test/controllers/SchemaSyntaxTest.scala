@@ -15,12 +15,8 @@ import java.nio.file.{Paths, Files}
 import java.nio.charset.StandardCharsets
 import xml.Utility._
 
-class SchemaSyntaxTest 
-  extends PlaySpec 
-  with Results 
-  with OneAppPerSuite {
-  
-  class CheckerController extends Controller with Checker
+
+class CheckerController extends Checker
   
   "Checker#schema" should {
     /*"convert simple well formed Shape in SHEXC" in {
@@ -88,4 +84,3 @@ class SchemaSyntaxTest
       }
     
  } */
-}

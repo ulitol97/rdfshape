@@ -5,6 +5,8 @@ import es.weso.rdf.{RDFReader, PrefixMap}
 import es.weso.utils.PrefixMapUtils
 import util._
 import xml.Utility.escape
+
+/*
 import es.weso.schema.Shacl_TQ._
 
 case class ViolationError(
@@ -78,3 +80,4 @@ object ViolationError {
   }
   
 }
+*/

@@ -15,17 +15,24 @@ case class SchemaInput(
     , schemaName: String  
     ) {
   
-  def getSchema: Try[Schema] = {
+  def getSchema: Try[HTMLSchema] = {
+    println("Geting schema...")
     for {
       str <- getSchemaStr
-      schema <- Schemas.fromString(str,inputFormat,schemaName,None)
-    } yield schema
+      schema <- {
+        println(s"schema str=$str")
+        HTMLSchemas.fromString(str,inputFormat,schemaName,None)
+      }
+    } yield {
+      println(s"Schema obtained...$schema")
+      schema
+    }
   }
   
   def convertSchema(outputFormat: String): Try[String] = {
     for {
       str <- getSchemaStr
-      schema <- Schemas.fromString(str,inputFormat,schemaName,None)
+      schema <- HTMLSchemas.fromString(str,inputFormat,schemaName,None)
       outStr <- schema.serialize(outputFormat)
     } yield outStr
   }
@@ -54,8 +61,8 @@ object SchemaInput {
              , schema_uri = ""
              , schema_file = None
              , schema_textarea = ""
-             , inputFormat = Schemas.defaultSchemaFormat
-             , schemaName = Schemas.defaultSchemaName
+             , inputFormat = HTMLSchemas.defaultSchemaFormat
+             , schemaName = HTMLSchemas.defaultSchemaName
              )
 
    def apply(schemaName: String) : SchemaInput = 
@@ -64,7 +71,7 @@ object SchemaInput {
              , schema_uri = ""
              , schema_file = None
              , schema_textarea = ""
-             , inputFormat = Schemas.defaultSchemaFormat
+             , inputFormat = HTMLSchemas.defaultSchemaFormat
              , schemaName = schemaName
              )
     

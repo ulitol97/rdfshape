@@ -1,4 +1,4 @@
-@(vr:ValidationResult)
+@(vr:ValidationResult)(implicit messages: Messages, webJarAssets: WebJarAssets)
 
 @if(vr.status == None || vr.dataStr=="") {
 } else {  

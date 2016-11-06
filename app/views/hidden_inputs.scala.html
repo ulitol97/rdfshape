@@ -1,4 +1,4 @@
-@(vf: ValidationForm)
+@(vf: ValidationForm)(implicit messages: Messages, webJarAssets: WebJarAssets)
 
 <input id="data" name="data" type="hidden" value="#@{vf.dataInput.input_type_Data}_data" /> 
 <input id="schema" name="schema" type="hidden" value="@{vf.schema_toggle}" />

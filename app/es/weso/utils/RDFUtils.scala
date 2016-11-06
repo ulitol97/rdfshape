@@ -6,7 +6,7 @@ import java.io.File
 import scala.util._
 import es.weso.rdf.jena.RDFAsJenaModel
 import es.weso.rdf._
-import es.weso.shex.DataFormat
+import es.weso.schema.DataFormat
 
 object RDFUtils {
 

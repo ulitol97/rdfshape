@@ -1,12 +1,11 @@
-@(vf: ValidationForm)
+@(vf: ValidationForm)(implicit messages: Messages, webJarAssets: WebJarAssets)
 
-@import play.api.i18n.Messages
 @import es.weso.schema._
 @{println("schemaNameView: " + vf.schemaName)}
 
 <label for="schema_name">@Messages("Schema.Name")</label>
 <select name="schema_name">
-      @for(s <- Schemas.availableSchemaNames) {
+      @for(s <- HTMLSchemas.availableSchemaNames) {
       	<option value="@s"
       	 @{if(vf.schemaName==s) { "selected" }}>@s</option>
       }

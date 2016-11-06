@@ -3,7 +3,7 @@ package es.weso.schema.shacl_tq
 import es.weso.rdf.nodes._
 import es.weso.rdf.parser.RDFParser
 import util._
-
+/*
 object ViolationErrorParser extends RDFParser {
   
   lazy val sh = IRI("http://www.w3.org/ns/shacl#")
@@ -33,4 +33,4 @@ object ViolationErrorParser extends RDFParser {
   }
   
 
-}
+}*/

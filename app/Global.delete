@@ -4,6 +4,7 @@ import play.api.mvc.Results._
 import scala.concurrent.Future
 import play.Logger
 
+/*
 object Global extends GlobalSettings {
 
   /* Default page if there is an error */
@@ -14,4 +15,4 @@ object Global extends GlobalSettings {
     ))
   }
 
-}
+} */

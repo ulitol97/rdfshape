@@ -1,5 +1,6 @@
 @(vr: ValidationResult = ValidationResult.empty,
-  vf: ValidationForm = ValidationForm() )
+  vf: ValidationForm = ValidationForm())(implicit messages: Messages,
+    webJarAssets: WebJarAssets)
 
 @import play.api.i18n.Messages
 
@@ -25,4 +26,4 @@
 
 </form>	
 
-}
+}(messages,webJarAssets)

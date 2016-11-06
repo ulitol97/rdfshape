@@ -1,7 +1,5 @@
 package es.weso.schema
 
-import es.weso.shex.SchemaFormat
-
 object SchemaUtils {
 
   val defaultSchemaFormat = SchemaFormat.default.name

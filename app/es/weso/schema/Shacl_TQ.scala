@@ -1,19 +1,18 @@
 package es.weso.schema
 
 import es.weso.shacl_tq.{ViolationError => _, ShaclBinder}
-import es.weso.schema.shacl_tq._
-import es.weso.shex.DataFormat
+import shacl_tq._
 import es.weso.rdf.RDFReader
 import es.weso.rdf.nodes._
 import es.weso.rdf.jena._
-import es.weso.validating._
+// import es.weso.validating._
 import util._
 import org.apache.jena.rdf.model.Model
-import es.weso.validating.Checked._
+// import es.weso.validating.Checked._
 import es.weso.rdf.PREFIXES.{rdf_type}
 import es.weso.utils.TryUtils
 import es.weso.rdf.PrefixMap
-
+/*
 case class Shacl_TQ(
     binder: ShaclBinder) extends Schema {
 
@@ -80,8 +79,8 @@ case class Shacl_TQ(
     val msg = 
       if (result.isOK) s"No errors found"
       else s"Not Valid" 
-    val solutions: Seq[Solution] = Seq()
-    val errors: Seq[ErrorInfo] = result.errors.map(violationError2ErrorInfo(_))
+    val solutions: Seq[HTMLSolution] = Seq()
+    val errors: Seq[HTMLErrorInfo] = result.errors.map(violationError2ErrorInfo(_))
     Result(isValid,msg,solutions,errors)
   }
 
@@ -89,8 +88,8 @@ case class Shacl_TQ(
     Result(false,msg,Seq(),Seq())  
   }
   
-  def violationError2ErrorInfo(ve: ViolationError): ErrorInfo = {
-    ErrorInfo(ve.toHTMLRow(pm))
+  def violationError2ErrorInfo(ve: ViolationError): HTMLErrorInfo = {
+    HTMLErrorInfo(ve.toHTMLRow(pm))
   }
   
   override def fromString(cs: CharSequence, format: String, base: Option[String]): Try[Schema] = {
@@ -152,4 +151,4 @@ object Shacl_TQ {
         addPrefix("rdf",rdf).
         addPrefix("rdfs",rdfs)
 
-}
+} */

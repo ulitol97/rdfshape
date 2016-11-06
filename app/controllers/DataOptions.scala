@@ -6,7 +6,7 @@ import es.weso.utils._
 import xml.Utility.escape
 import es.weso.rdf.nodes.RDFNode
 import es.weso.rdf.nodes.IRI
-import es.weso.shex.DataFormat
+import es.weso.schema.DataFormat
 import java.io.File
 import play.Logger
 

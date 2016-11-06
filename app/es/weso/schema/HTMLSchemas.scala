@@ -2,16 +2,16 @@ package es.weso.schema
 import util._
 import es.weso.rdf.RDFReader
 
-object Schemas {
+object HTMLSchemas {
 
 type SchemaParser = (CharSequence,String,Option[String]) => Try[Schema]
 
-lazy val shEx = ShEx3.empty
-lazy val shaclex = Shaclex.empty
-lazy val shacl_tq = Shacl_TQ.empty
+lazy val shEx = HTMLShEx.empty
+// lazy val shaclex = Shaclex.empty
+// lazy val shacl_tq = Shacl_TQ.empty
 
-val availableSchemas: List[Schema] = List(shEx,shaclex,shacl_tq)
-val defaultSchema : Schema = shEx
+val availableSchemas: List[HTMLSchema] = List(shEx) // ,shaclex,shacl_tq)
+val defaultSchema : HTMLSchema = shEx
 val defaultSchemaName: String = defaultSchema.name
 val defaultSchemaFormat: String = defaultSchema.defaultFormat
 
@@ -21,7 +21,7 @@ val availableFormats: List[String] = {
   availableSchemas.map(_.formats).flatten.distinct  
 }
 
-def lookupSchema(schemaName: String): Try[Schema] = {
+def lookupSchema(schemaName: String): Try[HTMLSchema] = {
   if (schemaName == "") Success(defaultSchema)
   else {
   val found = availableSchemas.filter(_.name.compareToIgnoreCase(schemaName)==0)
@@ -38,7 +38,10 @@ def getSchemaParser(schemaName: String): Try[SchemaParser] = {
 
 val schemaNames: List[String] = availableSchemas.map(_.name)
 
-def fromString(cs: CharSequence, format: String, schemaName: String, base: Option[String] = None): Try[Schema] = {
+def fromString(cs: CharSequence,
+               format: String,
+               schemaName: String,
+               base: Option[String] = None): Try[HTMLSchema] = {
   lookupSchema(schemaName) match {
     case Success(schema) => 
       if (cs.length == 0) Success(schema.empty)
@@ -47,7 +50,7 @@ def fromString(cs: CharSequence, format: String, schemaName: String, base: Optio
   }
 }
 
-def fromRDF(rdf: RDFReader, schemaName: String): Try[Schema] = {
+def fromRDF(rdf: RDFReader, schemaName: String): Try[HTMLSchema] = {
   for {
     defaultSchema <- lookupSchema(schemaName)
   ; schema <- defaultSchema.fromRDF(rdf)

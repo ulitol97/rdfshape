@@ -1,6 +1,4 @@
-@(vf:ValidationForm, result: String)
-
-@import play.api.i18n.Messages
+@(vf:ValidationForm, result: String)(implicit messages: Messages, webJarAssets: WebJarAssets)
 
 @main(Messages("Check.Data"))(vf) {
 

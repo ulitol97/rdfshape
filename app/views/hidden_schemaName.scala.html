@@ -1,6 +1,6 @@
-@()
-@import es.weso.schema.Schemas
+@()(implicit messages: Messages, webJarAssets: WebJarAssets)
+@import es.weso.schema.HTMLSchemas
 
-<input id="schema_name" name="schema_name" type="hidden" value="@Schemas.defaultSchemaName" /> 
+<input id="schema_name" name="schema_name" type="hidden" value="@HTMLSchemas.defaultSchemaName" />
 
 

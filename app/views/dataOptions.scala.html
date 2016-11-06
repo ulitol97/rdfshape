@@ -1,6 +1,4 @@
-@(dataOptions: DataOptions)
-
-@import play.api.i18n.Messages
+@(dataOptions: DataOptions)(implicit messages: Messages, webJarAssets: WebJarAssets)
 
 <fieldset>
 <legend>@Messages("Data.options")</legend>
