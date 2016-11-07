@@ -27,7 +27,7 @@ import javax.inject.{Inject, Singleton}
 import scala.util.{Success => TrySuccess}
 import DataOptions._
 import SchemaOptions._
-import es.weso.schema.HTMLSchemas
+import es.weso.htmlschema.HTMLSchemas
 import play.api.i18n.{I18nSupport, MessagesApi}
 
 
@@ -75,9 +75,10 @@ class Checker @Inject()(implicit val webJarAssets: WebJarAssets,
   } */
 
   def schema(schema: String, schemaFormat: String, schemaName: String) = Action {
-    println("Schema2 name: " + schemaName)
+    println(s"Schema2 name: $schemaName. String: $schema")
     HTMLSchemas.fromString(schema,schemaFormat,schemaName,None) match {
       case Success(schemaValue) => {
+        println(s"SchemaValue: $schemaValue")
         schemaValue.serialize("SHEXC") match {
           case Success(result) => {
             val schemaInput = SchemaInput(schema, schemaFormat, schemaName)

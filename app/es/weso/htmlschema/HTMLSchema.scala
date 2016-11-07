@@ -1,7 +1,10 @@
-package es.weso.schema
+package es.weso.htmlschema
+
 import es.weso.rdf._
 import es.weso.rdf.nodes._
-import util._
+import es.weso.schema.{Result, Schema}
+
+import scala.util._
 
 abstract class HTMLSchema extends Schema {
 

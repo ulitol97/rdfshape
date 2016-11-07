@@ -1,10 +1,11 @@
-package es.weso.schema
+package es.weso.htmlschema
+
 import es.weso.rdf._
 import es.weso.rdf.nodes._
-import org.scalactic._
-import es.weso.shex.{ Schema => ShExSchema, ShapeLabel => ShExLabel, _}
-import util._
-import es.weso.typing._
+import es.weso.schema.{Result, ShEx}
+import es.weso.shex.{Schema => ShExSchema, ShapeLabel => ShExLabel}
+
+import scala.util._
 
 case class HTMLShEx(schema: ShEx) extends HTMLSchema {
   override def name = schema.name
@@ -79,7 +80,19 @@ case class HTMLShEx(schema: ShEx) extends HTMLSchema {
   } */
   
   override def fromString(cs: CharSequence, format: String, base: Option[String]): Try[HTMLSchema] = {
-    ShEx.fromString(cs,format,base).map(HTMLShEx(_))
+    println(s"HTMLShEx fromString: $cs $format")
+    val result = ShEx.fromString(cs,format,base).map(HTMLShEx(_)) match {
+      case Success(schema) => {
+        println(s"Schema obtained: $schema")
+        Success(schema)
+      }
+      case Failure(e) => {
+        println(s"fromString error : $e")
+        Failure(e)
+      }
+    }
+    println(s"HTMLShEx fromString end...")
+    result
   }
   
   override def fromRDF(rdf: RDFReader): Try[HTMLSchema] = {

@@ -1,10 +1,13 @@
-package es.weso.schema
-import util._
+package es.weso.htmlschema
+
 import es.weso.rdf.RDFReader
+import es.weso.schema.Schema
+
+import scala.util._
 
 object HTMLSchemas {
 
-type SchemaParser = (CharSequence,String,Option[String]) => Try[Schema]
+type SchemaParser = (CharSequence,String,Option[String]) => Try[HTMLSchema]
 
 lazy val shEx = HTMLShEx.empty
 // lazy val shaclex = Shaclex.empty
@@ -42,8 +45,10 @@ def fromString(cs: CharSequence,
                format: String,
                schemaName: String,
                base: Option[String] = None): Try[HTMLSchema] = {
+  println(s"HTMLSchema fromString $cs $format $schemaName")
   lookupSchema(schemaName) match {
-    case Success(schema) => 
+    case Success(schema) =>
+      println(s"Schema: $schema")
       if (cs.length == 0) Success(schema.empty)
       else schema.fromString(cs,format,base)
     case Failure(e) => Failure(e)

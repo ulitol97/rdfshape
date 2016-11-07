@@ -1,4 +1,4 @@
-package es.weso.schema
+package es.weso.htmlschema
 
 object SchemaUtils {
 

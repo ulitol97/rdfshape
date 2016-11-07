@@ -12,7 +12,6 @@ import play.api._
 import play.api.mvc._
 import play.api.libs.Files._
 import es.weso.shex.Schema
-import es.weso.schema.DataFormat
 
 import scala.util.{Try, Failure => TryFailure, Success => TrySuccess}
 import es.weso.rdf._
@@ -28,6 +27,7 @@ import javax.inject.{Inject, Singleton}
 
 import es.weso.utils.IOUtils._
 import Multipart._
+import es.weso.htmlschema.DataFormat
 import play.api.libs.json._
 import es.weso.schema._
 import play.api.i18n.{I18nSupport, MessagesApi}

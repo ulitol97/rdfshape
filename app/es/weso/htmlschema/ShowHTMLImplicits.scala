@@ -1,9 +1,16 @@
-package es.weso.schema
+package es.weso.htmlschema
+
 import es.weso.rdf.PrefixMap
 import es.weso.utils.ShowHTML
 import es.weso.utils.ShowHTML._
 import es.weso.rdf.nodes.RDFNode
 import es.weso.utils.PrefixMapUtils._
+import es.weso.schema.{Result,
+              Explanation,
+              InfoNode,
+              Solution,
+              ErrorInfo,
+ ShapeLabel}
 
 import scala.xml.Utility._
 

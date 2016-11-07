@@ -1,6 +1,9 @@
 package controllers
 
 import java.io.File
+
+import es.weso.htmlschema.{HTMLSchema, HTMLSchemas}
+
 import scala.util._
 import es.weso.rdf._
 import es.weso.schema._

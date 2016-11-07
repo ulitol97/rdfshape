@@ -1,6 +1,6 @@
-package es.weso.schema
+package es.weso.htmlschema
 
-import util._
+import scala.util._
 
 case class DataFormat(name: String)
 

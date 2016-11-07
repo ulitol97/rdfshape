@@ -1,17 +1,20 @@
 package controllers
 
 import es.weso.rdf.PrefixMap
+
 import xml.Utility.escape
 import es.weso.rdf.nodes._
 import java.io.File
-import util.{Try, Success => TrySuccess, Failure => TryFailure}
+
+import es.weso.htmlschema.DataFormat
+
+import util.{Try, Failure => TryFailure, Success => TrySuccess}
 import es.weso.utils.RDFUtils._
 import es.weso.utils.IOUtils._
 import es.weso.rdf._
 import views.html.helper.input
 import es.weso.rdf.jena._
 import es.weso.utils._
-import es.weso.schema.DataFormat
 import es.weso.rdf.jena.RDFAsJenaModel
 
 

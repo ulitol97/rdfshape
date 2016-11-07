@@ -3,11 +3,13 @@ package controllers
 import es.weso.monads._
 import es.weso.rdf._
 import es.weso.utils._
+
 import xml.Utility.escape
 import es.weso.rdf.nodes.RDFNode
 import es.weso.rdf.nodes.IRI
-import es.weso.schema.DataFormat
 import java.io.File
+
+import es.weso.htmlschema.DataFormat
 import play.Logger
 
 

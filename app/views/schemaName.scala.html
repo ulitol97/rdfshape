@@ -1,6 +1,6 @@
 @(vf: ValidationForm)(implicit messages: Messages, webJarAssets: WebJarAssets)
 
-@import es.weso.schema._
+@import es.weso.htmlschema.HTMLSchemas
 @{println("schemaNameView: " + vf.schemaName)}
 
 <label for="schema_name">@Messages("Schema.Name")</label>

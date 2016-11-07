@@ -1,7 +1,9 @@
 package controllers
 
-import scala.util.{ Success, Try }
-import es.weso.utils.IOUtils.{ failMsg, getFileContents, getURI }
+import es.weso.htmlschema.HTMLSchemas
+
+import scala.util.{Success, Try}
+import es.weso.utils.IOUtils.{failMsg, getFileContents, getURI}
 import es.weso.schema._
 import es.weso.rdf.nodes._
 

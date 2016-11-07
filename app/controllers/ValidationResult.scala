@@ -1,15 +1,17 @@
 package controllers
 
-import scala.util.{ Try, Failure, Success }
+import es.weso.htmlschema.{HTMLSchema, HTMLSchemas, SchemaUtils}
 
+import scala.util.{Failure, Success, Try}
 import es.weso.rdf.RDFReader
-import es.weso.rdf.nodes.{ IRI, RDFNode }
-import es.weso.schema._
+import es.weso.rdf.nodes.{IRI, RDFNode}
+import es.weso.schema.{AllNodesAllShapes, NodeAllShapes, Result, ScopeDeclarations}
 import play.Logger
 import es.weso.rdf.PrefixMap
 import es.weso.utils.ShowHTML
 import es.weso.utils.ShowHTML._
-import es.weso.schema.ShowHTMLImplicits._
+import es.weso.htmlschema._
+import es.weso.htmlschema.ShowHTMLImplicits._
 
 case class ValidationResult(
     status: Option[Boolean],  // 
@@ -105,7 +107,7 @@ object ValidationResult {
     data: RDFReader,
     dataStr: String,
     dataOptions: DataOptions,
-    schema: Schema,
+    schema: HTMLSchema,
     schemaStr: String,
     schemaFormat: String,
     schemaName: String,
@@ -136,7 +138,7 @@ object ValidationResult {
     data: RDFReader, 
     dataStr: String, 
     dataOptions: DataOptions, 
-    schema: Schema, 
+    schema: HTMLSchema,
     schemaStr: String, 
     schemaFormat: String,
     schemaName: String,
@@ -166,7 +168,7 @@ object ValidationResult {
     data: RDFReader, 
     dataStr: String, 
     dataOptions: DataOptions, 
-    schema: Schema, 
+    schema: HTMLSchema,
     schemaStr: String, 
     schemaFormat: String,
     schemaName: String,
@@ -200,7 +202,7 @@ object ValidationResult {
     schemaOptions: SchemaOptions
     ): ValidationResult = {
      println(s"validating when they are together..., schemaName: $schemaName")
-     val trySchema = Schemas.fromRDF(rdf,schemaName)
+     val trySchema = HTMLSchemas.fromRDF(rdf,schemaName)
      trySchema match {
         case Success(schema) => {
           val format = dataOptions.format
