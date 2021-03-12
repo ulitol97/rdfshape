@@ -1,31 +1,24 @@
 package es.weso.rdfshape
 
+import cats.effect._
+import com.typesafe.scalalogging._
+import es.weso.rdf.jena.RDFAsJenaModel
+import es.weso.schema._
+import es.weso.server._
+import es.weso.utils.FileUtils
 import org.rogach.scallop._
 import org.rogach.scallop.exceptions._
-import com.typesafe.scalalogging._
-import es.weso.server._
-import es.weso.schema._
-import es.weso.rdf.jena.RDFAsJenaModel
-
-import scala.concurrent.duration._
-import es.weso.utils.FileUtils
-import cats.data.EitherT
-import cats.effect._
-import scala.util._
 import java.nio.file._
-
-// import es.weso.quickstart.QuickStartMain
+import scala.concurrent.duration._
 import es.weso.rdf.RDFReader
 import es.weso.rdf.nodes.IRI
-import es.weso.utils.IOUtils._
 
 object Main extends App with LazyLogging {
     try {
       run(args)
     } catch {
-      case (e: Exception) => {
+      case e: Exception =>
         println(s"Error: ${e.getMessage}")
-      }
     }
 
   def run(args: Array[String]): Unit = {
@@ -130,17 +123,15 @@ object Main extends App with LazyLogging {
     }
   }
 
-  private def errorDriver(e: Throwable, scallop: Scallop) = e match {
-    case Help(s) => {
+  private def errorDriver(e: Throwable, scallop: Scallop): Nothing = e match {
+    case Help(s) =>
       println("Help: " + s)
       scallop.printHelp
       sys.exit(0)
-    }
-    case _ => {
+    case _ =>
       println("Error: %s".format(e.getMessage))
       scallop.printHelp
       sys.exit(1)
-    }
   }
 
 /*  def getShapeMapStr(opts: MainOpts): IO[String] = {
@@ -158,7 +149,7 @@ object Main extends App with LazyLogging {
     if (opts.data.isDefined) {
       val path = baseFolder.resolve(opts.data())
       for {
-        res <- RDFAsJenaModel.fromFile(path.toFile(), opts.dataFormat(), base)
+        res <- RDFAsJenaModel.fromFile(path.toFile, opts.dataFormat(), base)
 /*        newRdf <- if (opts.inference.isDefined) {
           io2es(rdf.applyInference(opts.inference()))
         } else
@@ -174,7 +165,7 @@ object Main extends App with LazyLogging {
     val base = Some(FileUtils.currentFolderURL)
     if (opts.schema.isDefined) {
       val path = baseFolder.resolve(opts.schema())
-      val schema = Schemas.fromFile(path.toFile(), opts.schemaFormat(), opts.engine(), base)
+      val schema = Schemas.fromFile(path.toFile, opts.schemaFormat(), opts.engine(), base)
       schema
     } else {
       logger.info("Schema not specified. Extracting schema from data")

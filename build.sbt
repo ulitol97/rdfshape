@@ -33,7 +33,7 @@ lazy val umlShaclexVersion = "0.0.80"
 lazy val shexsVersion      = "0.1.81"
 
 lazy val any23Version = "2.2"
-lazy val rdf4jVersion = "2.2.4"
+lazy val rdf4jVersion = "3.4.2"
 
 // Dependency versions
 lazy val catsVersion         = "2.3.0"
@@ -211,14 +211,14 @@ lazy val sharedDependencies = Seq(
 )
 
 lazy val packagingSettings = Seq(
-  mainClass in Compile        := Some("es.weso.rdfshape.Main"),
-  mainClass in assembly       := Some("es.weso.rdfshape.Main"),
-  test in assembly            := {},
-  assemblyJarName in assembly := "rdfshape.jar",
-  assemblyOutputPath in assembly := file("/target/assembly"),
-  packageSummary in Linux     := name.value,
-  packageSummary in Windows   := name.value,
-  packageDescription          := name.value
+  mainClass in Compile           := Some("es.weso.rdfshape.Main"),
+  mainClass in assembly          := Some("es.weso.rdfshape.Main"),
+  test in assembly               := {},
+  assemblyJarName in assembly    := "rdfshape.jar",
+  assemblyOutputPath in assembly := file("target/assembly"),
+  packageSummary in Linux        := name.value,
+  packageSummary in Windows      := name.value,
+  packageDescription             := name.value
 )
 
 lazy val compilationSettings = Seq(
@@ -266,7 +266,7 @@ lazy val wixSettings = Seq(
 )
 
 lazy val ghPagesSettings = Seq(
-  git.remoteRepo := "git@github.com:labra/rdfshape.git"
+  git.remoteRepo := "git@github.com:weso/rdfshape.git"
 )
 
 lazy val commonSettings = compilationSettings ++ sharedDependencies ++ Seq(
@@ -319,3 +319,5 @@ scalacOptions += s"-P:silencer:sourceRoots=${baseDirectory.value.getCanonicalPat
 artifactName := { (sv: ScalaVersion, module: ModuleID, artifact: Artifact) =>
   artifact.name + "." + artifact.extension
 }
+
+Global / lintUnusedKeysOnLoad := false

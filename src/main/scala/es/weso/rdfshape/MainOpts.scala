@@ -10,20 +10,20 @@ class MainOpts(
   arguments: Array[String],
   onError: (Throwable, Scallop) => Nothing) extends ScallopConf(arguments) {
 
-  lazy val defaultEngine = engines.head
-  lazy val engines = Schemas.availableSchemaNames.map(_.toUpperCase) // List("SHEX","SHACL")
+  lazy val defaultEngine: String = engines.head
+  lazy val engines: List[String] = Schemas.availableSchemaNames.map(_.toUpperCase) // List("SHEX","SHACL")
   lazy val defaultDataFormat = "TURTLE"
-  lazy val dataFormats = RDFAsJenaModel.availableFormats.map(_.toUpperCase).distinct
-  lazy val schemaFormats = Schemas.availableFormats.map(_.toUpperCase).distinct
+  lazy val dataFormats: List[String] = RDFAsJenaModel.availableFormats.map(_.toUpperCase).distinct
+  lazy val schemaFormats: List[String] = Schemas.availableFormats.map(_.toUpperCase).distinct
   lazy val defaultSchemaFormat = "TURTLE"
-  lazy val defaultTrigger = ValidationTrigger.default.name
-  lazy val triggerModes = ValidationTrigger.triggerValues.map(_._1.toUpperCase).distinct
-  lazy val resultFormats = Result.availableResultFormats
-  lazy val defaultResultFormat = Result.defaultResultFormat
-  lazy val defaultShapeMapFormat = ShapeMap.defaultFormat
-  lazy val shapeMapFormats = ShapeMap.formats
+  lazy val defaultTrigger: String = ValidationTrigger.default.name
+  lazy val triggerModes: List[String] = ValidationTrigger.triggerValues.map(_._1.toUpperCase).distinct
+  lazy val resultFormats: List[String] = Result.availableResultFormats
+  lazy val defaultResultFormat: String = Result.defaultResultFormat
+  lazy val defaultShapeMapFormat: String = ShapeMap.defaultFormat
+  lazy val shapeMapFormats: List[String] = ShapeMap.formats
   lazy val defaultValidationReportFormat = "TURTLE"
-  lazy val validationReportFormats = RDFAsJenaModel.availableFormats.map(_.toUpperCase).distinct
+  lazy val validationReportFormats: List[String] = RDFAsJenaModel.availableFormats.map(_.toUpperCase).distinct
 
   banner("""| shaclex: SHACL/ShEx processor
             | Options:
@@ -31,46 +31,46 @@ class MainOpts(
 
   footer("Enjoy!")
 
-  val schema = opt[String](
+  val schema: ScallopOption[String] = opt[String](
     "schema",
     short = 's',
     default = None,
     descr = "schema file")
 
-  val schemaFormat = opt[String](
+  val schemaFormat: ScallopOption[String] = opt[String](
     "schemaFormat",
     noshort = true,
     default = Some(defaultSchemaFormat),
     descr = s"Schema format. Default ($defaultDataFormat) Possible values: ${showLs(schemaFormats)}",
     validate = isMemberOf(schemaFormats))
 
-  val data = opt[String](
+  val data: ScallopOption[String] = opt[String](
     "data",
     default = None,
     descr = "Data file(s) to validate",
     short = 'd')
 
-  val dataFormat = opt[String](
+  val dataFormat: ScallopOption[String] = opt[String](
     "dataFormat",
     default = Some(defaultDataFormat),
     descr = s"Data format. Default ($defaultDataFormat). Possible values = ${showLs(dataFormats)}",
     validate = isMemberOf(dataFormats),
     noshort = true)
 
-  val shapeMap = opt[String](
+  val shapeMap: ScallopOption[String] = opt[String](
     "shapeMap",
     default = None,
     descr = s"Shape map",
     noshort = true)
 
-  val shapeMapFormat = opt[String](
+  val shapeMapFormat: ScallopOption[String] = opt[String](
     "shapeMapFormat",
     default = Some(defaultShapeMapFormat),
     descr = s"Shape Map format. Default ($defaultShapeMapFormat). Possible values = ${showLs(shapeMapFormats)}",
     validate = isMemberOf(shapeMapFormats),
     noshort = true)
 
-  val showValidationReport = toggle(
+  val showValidationReport: ScallopOption[Boolean] = toggle(
     name = "showValidationReport",
     prefix = "no-",
     default = Some(false),
@@ -79,25 +79,25 @@ class MainOpts(
     noshort = true
   )
 
-  val validationReportFormat = opt[String](
+  val validationReportFormat: ScallopOption[String] = opt[String](
     "validationReportFormat",
     default = Some(defaultValidationReportFormat),
     descr = s"Engine. Default ($defaultValidationReportFormat). Possible values: ${showLs(validationReportFormats)}",
     validate = isMemberOf(validationReportFormats))
 
-  val engine = opt[String](
+  val engine: ScallopOption[String] = opt[String](
     "engine",
     default = Some(defaultEngine),
     descr = s"Engine. Default ($defaultEngine). Possible values: ${showLs(engines)}",
     validate = isMemberOf(engines))
 
-  val trigger = opt[String](
+  val trigger: ScallopOption[String] = opt[String](
     "trigger",
     default = Some(defaultTrigger),
     descr = s"Trigger mode. Default ($defaultTrigger). Possible values: ${showLs(triggerModes)}",
     validate = isMemberOf(triggerModes))
 
-  val explain = toggle(
+  val explain: ScallopOption[Boolean] = toggle(
     "explain",
     prefix = "no-",
     default = Some(false),
@@ -106,7 +106,7 @@ class MainOpts(
     noshort = true
   )
 
-  val showResult = toggle(
+  val showResult: ScallopOption[Boolean] = toggle(
     "showResult",
     prefix = "no-",
     default = Some(true),
@@ -114,7 +114,7 @@ class MainOpts(
     descrNo = "don't show result",
     noshort = true)
 
-  val showSchema = toggle(
+  val showSchema: ScallopOption[Boolean] = toggle(
     "showSchema",
     prefix = "no-",
     default = Some(false),
@@ -122,7 +122,7 @@ class MainOpts(
     descrNo = "don't show schema",
     noshort = true)
 
-  val showData = toggle(
+  val showData: ScallopOption[Boolean] = toggle(
     "showData",
     prefix = "no-",
     default = Some(false),
@@ -130,7 +130,7 @@ class MainOpts(
     descrNo = "don't show data",
     noshort = true)
 
-  val showShapeMap = toggle(
+  val showShapeMap: ScallopOption[Boolean] = toggle(
     "showShapeMap",
     prefix = "no-",
     default = Some(false),
@@ -138,25 +138,25 @@ class MainOpts(
     descrNo = "don't input show map",
     noshort = true)
 
-  val outputFile = opt[String](
+  val outputFile: ScallopOption[String] = opt[String](
     "outputFile",
     default = None,
     descr = "save report a file",
     short = 'f')
 
-  val outSchemaFormat = opt[String](
+  val outSchemaFormat: ScallopOption[String] = opt[String](
     "outSchemaFormat",
     default = Some(defaultSchemaFormat),
     descr = "schema format to show",
     noshort = true)
 
-  val outShapeMapFormat = opt[String](
+  val outShapeMapFormat: ScallopOption[String] = opt[String](
     "outShapeMapFormat",
     default = Some(defaultShapeMapFormat),
     descr = "format of shape map to show",
     noshort = true)
 
-  val showLog = toggle(
+  val showLog: ScallopOption[Boolean] = toggle(
     "showLog",
     prefix = "no-",
     default = Some(false),
@@ -164,53 +164,53 @@ class MainOpts(
     descrNo = "don't show log info",
     noshort = true)
 
-  val resultFormat = opt[String](
+  val resultFormat: ScallopOption[String] = opt[String](
     "resultFormat",
     default = Some(defaultResultFormat),
     descr = "format to show result",
     noshort = true,
     validate = isMemberOf(resultFormats))
 
-  val cnvEngine = opt[String](
+  val cnvEngine: ScallopOption[String] = opt[String](
     "cnvEngine",
     default = None,
     descr = "convert schema to schema in another engine",
     noshort = true,
     validate = isMemberOf(engines))
 
-  val outDataFormat = opt[String](
+  val outDataFormat: ScallopOption[String] = opt[String](
     "outDataFormat",
     default = None,
     descr = "data format to show",
     noshort = true)
 
-  val baseFolder = opt[String](
+  val baseFolder: ScallopOption[String] = opt[String](
     "baseFolder",
     default = None,
     descr = "base folder",
     short = 'b')
 
-  val node = opt[String](
+  val node: ScallopOption[String] = opt[String](
     "node",
     short = 'n',
     default = None,
     required = false,
     descr = "Node to validate")
 
-  val shapeLabel = opt[String](
+  val shapeLabel: ScallopOption[String] = opt[String](
     "shape",
     short = 'l',
     default = None,
     required = false,
     descr = "Label (IRI) of Constraint in Schema")
 
-  val inference = opt[String](
+  val inference: ScallopOption[String] = opt[String](
     "inference",
     default = None,
     required = false,
     descr = "Apply some inference before. Available values: RDFS")
 
-  val server = toggle(
+  val server: ScallopOption[Boolean] = toggle(
     "server",
     prefix = "no-",
     default = Some(false),
@@ -218,7 +218,7 @@ class MainOpts(
     descrNo = "command line mode",
     noshort = true)
 
-  val time = toggle(
+  val time: ScallopOption[Boolean] = toggle(
     "time",
     prefix = "no-",
     default = Some(false),
@@ -226,13 +226,13 @@ class MainOpts(
     descrNo = "don't show time",
     short = 't')
 
-  override protected def onError(e: Throwable) = onError(e, builder)
+  override protected def onError(e: Throwable): Unit = onError(e, builder)
 
   // Some utils...
   def showLs(ls: List[String]): String =
     ls.mkString(",")
 
   def isMemberOf(ls: List[String])(x: String): Boolean =
-    ls contains (x.toUpperCase)
+    ls contains x.toUpperCase
 
 }
