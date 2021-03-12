@@ -6,6 +6,7 @@ import es.weso.schema._
 import es.weso.server.QueryParams._
 import org.http4s._
 import org.http4s.multipart._
+import org.http4s.server.staticcontent.resourceServiceBuilder
 import org.http4s.twirl._
 // import cats.effect.IO._
 import cats.data.EitherT
@@ -26,7 +27,7 @@ class StaticService[F[_]](blocker: Blocker)(implicit F: Effect[F], cs: ContextSh
   private val logger = getLogger
 
   def routes(implicit timer: Timer[F]): HttpRoutes[F] =
-    resourceService[F](ResourceService.Config("/static", blocker)) // .combineK(webjars)
+    resourceServiceBuilder[F](basePath = "/static", blocker).toRoutes // .combineK(webjars)
 
 /*  private val webjars: HttpRoutes[F] = {
     def isJsAsset(asset: WebjarAsset): Boolean = asset.asset.endsWith(".js")

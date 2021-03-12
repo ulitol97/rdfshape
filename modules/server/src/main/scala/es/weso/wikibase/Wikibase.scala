@@ -1,7 +1,6 @@
 package es.weso.wikibase
 import es.weso.rdf.nodes._
 import org.http4s._
-import org.http4s.syntax._
 import org.http4s.implicits._
 
 abstract class Wikibase {
@@ -13,10 +12,10 @@ abstract class Wikibase {
 case object Wikidata extends Wikibase {
   def name        = "wikidata"
   def url         = uri"https://www.wikidata.org"
-  def endpointUrl = IRI("https://query.wikidata.org/sparql")
+  def endpointUrl: IRI = IRI("https://query.wikidata.org/sparql")
 
   def schemaEntityUri(wdSchema: String): Uri = {
-    val uri = uri"https://www.wikidata.org".withPath(s"/wiki/Special:EntitySchemaText/${wdSchema}")
+    val uri = uri"https://www.wikidata.org".withPath(Uri.Path.fromString(s"/wiki/Special:EntitySchemaText/${wdSchema}"))
     uri
   }
 

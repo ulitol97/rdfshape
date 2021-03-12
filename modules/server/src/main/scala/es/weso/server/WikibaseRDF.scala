@@ -1,3 +1,4 @@
+/*
 package es.weso.server
 
 import es.weso.rdf._
@@ -23,7 +24,7 @@ import java.io.ByteArrayOutputStream
 import io.circe.Json
 import io.circe.parser.parse
 
-/*
+
 case class CachedState(iris: Set[IRI], rdf: RDFAsJenaModel) 
 
 object CachedState {

@@ -72,26 +72,26 @@ class WikidataService[F[_]: ConcurrentEffect: LiftIO](blocker: Blocker,
         val uri = Uri.unsafeFromString(s"https://www.wikidata.org/w/api.php?action=wbgetentities&props=labels&ids=${entity}&languages=${language}&format=json")
         val req: Request[F] = Request(method = GET, uri = uri)
          for {
-          either <- client.fetch(req) {
+          either <- client.run(req).use({
             case Status.Successful(r) => r.attemptAs[Json].leftMap(_.message).value
             case r => r.as[String].map(b => s"Request $req failed with status ${r.status.code} and body $b".asLeft[Json])
-          }
-          resp <- Ok(either.fold(Json.fromString(_), identity))
+          })
+          resp <- Ok(either.fold(Json.fromString, identity))
          } yield resp
     }
 
     case GET -> Root / `api` / "wikidata" / "schemaContent" :?
       WdSchemaParam(wdSchema) => {
       val uri = uri"https://www.wikidata.org".
-        withPath(s"/wiki/Special:EntitySchemaText/${wdSchema}")
+        withPath(Uri.Path.fromString(s"/wiki/Special:EntitySchemaText/${wdSchema}"))
 
       println(s"wikidata/schemaContent: ${uri.toString}")
       val req: Request[F] = Request(method = GET, uri = uri)
       for {
-        eitherValues <- client.fetch(req) {
+        eitherValues <- client.run(req).use({
           case Status.Successful(r) => r.attemptAs[String].leftMap(_.message).value
           case r => r.as[String].map(b => s"Request $req failed with status ${r.status.code} and body $b".asLeft[String])
-        }
+        })
         json: Json = eitherValues.fold(
           e => Json.fromFields(List(("error", Json.fromString(e)))),
           s => Json.fromFields(List(("result",Json.fromString(s))))
@@ -113,7 +113,7 @@ class WikidataService[F[_]: ConcurrentEffect: LiftIO](blocker: Blocker,
       val requestUrl = s"${endpoint.getOrElse("https://www.wikidata.org")}"
       println(requestUrl)
       val uri = Uri.fromString(requestUrl).valueOr(throw _).
-        withPath("/w/api.php").
+        withPath(Uri.Path.fromString("/w/api.php")).
         withQueryParam("action", "wbsearchentities").
         withQueryParam("search", label).
         withQueryParam("language", language).
@@ -125,10 +125,10 @@ class WikidataService[F[_]: ConcurrentEffect: LiftIO](blocker: Blocker,
 
       val req: Request[F] = Request(method = GET, uri = uri)
       for {
-        eitherValues <- client.fetch(req) {
+        eitherValues <- client.run(req).use({
           case Status.Successful(r) => r.attemptAs[Json].leftMap(_.message).value
           case r => r.as[String].map(b => s"Request $req failed with status ${r.status.code} and body $b".asLeft[Json])
-        }
+        })
         eitherResult = for {
           json <- eitherValues
           converted <- cnvEntities(json)
@@ -148,7 +148,7 @@ class WikidataService[F[_]: ConcurrentEffect: LiftIO](blocker: Blocker,
 
       val requestUrl = s"${endpoint.getOrElse("https://www.wikidata.org")}"
       val uri = Uri.fromString(requestUrl).valueOr(throw _).
-        withPath("/w/api.php").
+        withPath(Uri.Path.fromString("/w/api.php")).
         withQueryParam("action", "wbsearchentities").
         withQueryParam("search", label).
         withQueryParam("language", language).
@@ -159,15 +159,15 @@ class WikidataService[F[_]: ConcurrentEffect: LiftIO](blocker: Blocker,
 
       val req: Request[F] = Request(method = GET, uri = uri)
       for {
-        eitherValues <- client.fetch(req) {
+        eitherValues <- client.run(req).use({
           case Status.Successful(r) => r.attemptAs[Json].leftMap(_.message).value
           case r => r.as[String].map(b => s"Request $req failed with status ${r.status.code} and body $b".asLeft[Json])
-        }
+        })
         eitherResult = for {
           json <- eitherValues
           converted <- cnvEntities(json)
         } yield converted
-        resp <- Ok(eitherResult.fold(Json.fromString(_), identity))
+        resp <- Ok(eitherResult.fold(Json.fromString _, identity))
       } yield resp
     }
 
@@ -182,7 +182,7 @@ class WikidataService[F[_]: ConcurrentEffect: LiftIO](blocker: Blocker,
       println(s"SearchLexeme!!")
 
       val uri = uri"https://www.wikidata.org".
-        withPath("/w/api.php").
+        withPath(Uri.Path.fromString("/w/api.php")).
         withQueryParam("action", "wbsearchentities").
         withQueryParam("search", label).
         withQueryParam("language", language).
@@ -195,22 +195,22 @@ class WikidataService[F[_]: ConcurrentEffect: LiftIO](blocker: Blocker,
 
       val req: Request[F] = Request(method = GET, uri = uri)
       for {
-        eitherValues <- client.fetch(req) {
+        eitherValues <- client.run(req).use ({
           case Status.Successful(r) => r.attemptAs[Json].leftMap(_.message).value
           case r => r.as[String].map(b => s"Request $req failed with status ${r.status.code} and body $b".asLeft[Json])
-        }
+        })
         eitherResult = for {
           json <- eitherValues
           converted <- cnvEntities(json)
         } yield converted
-        resp <- Ok(eitherResult.fold(Json.fromString(_), identity))
+        resp <- Ok(eitherResult.fold(Json.fromString, identity))
       } yield resp
     }
 
     case GET -> Root / `api` / "wikidata" / "languages" => {
 
       val uri = uri"https://www.wikidata.org".
-        withPath("/w/api.php").
+        withPath(Uri.Path.fromString("/w/api.php")).
         withQueryParam("action", "query").
         withQueryParam("meta", "wbcontentlanguages").
         withQueryParam("wbclcontext", "term").
@@ -221,10 +221,10 @@ class WikidataService[F[_]: ConcurrentEffect: LiftIO](blocker: Blocker,
 
       val req: Request[F] = Request(method = GET, uri = uri)
       for {
-        eitherValues <- client.fetch(req) {
+        eitherValues <- client.run(req).use({
           case Status.Successful(r) => r.attemptAs[Json].leftMap(_.message).value
           case r => r.as[String].map(b => s"Request $req failed with status ${r.status.code} and body $b".asLeft[Json])
-        }
+        })
         eitherResult = for {
           json <- eitherValues
           converted <- cnvLanguages(json)
@@ -247,10 +247,10 @@ class WikidataService[F[_]: ConcurrentEffect: LiftIO](blocker: Blocker,
                .withHeaders(
                  `Accept`(MediaType.application.`json`)
                )
-          eitherValue <- client.fetch(req) {
+          eitherValue <- client.run(req).use ({
             case Status.Successful(r) => r.attemptAs[Json].leftMap(_.message).value
             case r => r.as[String].map(b => s"Request $req failed with status ${r.status.code} and body $b".asLeft[Json])
-          }
+          })
           resp <- Ok(eitherValue.fold(Json.fromString, identity))
         } yield resp
       }
@@ -643,7 +643,7 @@ class WikidataService[F[_]: ConcurrentEffect: LiftIO](blocker: Blocker,
 
  private def cnvEntitySchema(wdSchema: String): Uri = { 
    val uri = uri"https://www.wikidata.org".
-         withPath(s"/wiki/Special:EntitySchemaText/${wdSchema}")
+         withPath(Uri.Path.fromString(s"/wiki/Special:EntitySchemaText/${wdSchema}"))
    uri      
  }
 
